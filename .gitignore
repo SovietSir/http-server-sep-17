@@ -1,0 +1,58 @@
+# .gitignore
+
+.classpath
+.metadata/
+.project
+*.properties
+!sonar-project.properties
+.gradle/
+.settings
+bin/
+build/
+logs/
+sierra.jar
+sierraweb.jar
+target-eclipse/
+target/
+*bak
+*.log
+*.ser
+sierra.dump
+
+# ignore all /shared/libs folders except /shared/libs/iii* these are not included in the shared_libs.zip hosted on s3
+shared/libs/*
+!/shared/libs/iii*
+!/shared/libs/sierra/*
+
+# VIM related ignores from https://github.com/github/gitignore/blob/master/Global/Vim.gitignore
+# swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+# session
+Session.vim
+# temporary
+.netrwhist
+*~
+# auto-generated tag files
+tags
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+!/gradle/*
+/gradle/dev-build.properties
+
+# IntelliJ IDEA
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+/out/
+*.iml
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# III Ant build dependent folders
+${iii.build.output}/
+m2/
