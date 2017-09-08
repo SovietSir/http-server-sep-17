@@ -74,6 +74,7 @@ public class Server {
         //лайтовая версия - считаем, что считали сразу все нужные байты
         //TODO: проверять на получение всего сообщения (либо нужной части)
         val bytesRead = socketChannel.read(buffer);
+        if (bytesRead == -1 && buffer.position() == 0) return;
         log.debug(String.format("Received %d bytes", bytesRead));
         buffer.flip();
         key.interestOps(SelectionKey.OP_WRITE);
