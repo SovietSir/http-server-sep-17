@@ -18,6 +18,7 @@ import java.util.Arrays;
 public class Server {
     private final int port;
     private final int bufferCapacity;
+    private final Respondent respondent = new Respondent();
 
     public Server(int port, int bufferCapacity) {
         this.port = port;
@@ -92,7 +93,7 @@ public class Server {
             log.debug(String.format("Request: %s", request));
             buffer.clear();
 
-            String response = "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\"response\": \"hello\"}";
+            String response = respondent.getResponse(request);
             log.debug(String.format("Response: %s", response));
             val responseBytes = response.getBytes();
             for (int i = 0; i < responseBytes.length; i += bufferCapacity) {
