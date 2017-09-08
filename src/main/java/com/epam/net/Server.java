@@ -97,7 +97,9 @@ public class Server {
             log.debug(String.format("Response: %s", response));
             val responseBytes = response.getBytes();
             for (int i = 0; i < responseBytes.length; i += bufferCapacity) {
-                buffer.put(Arrays.copyOfRange(responseBytes, i, i + bufferCapacity));
+                int limit = i + bufferCapacity;
+                if (limit > responseBytes.length) limit = responseBytes.length;
+                buffer.put(Arrays.copyOfRange(responseBytes, i, limit));
                 buffer.flip();
                 socketChannel.write(buffer);
                 buffer.clear();
