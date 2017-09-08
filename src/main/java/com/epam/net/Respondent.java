@@ -9,10 +9,10 @@ class Respondent {
     }
 
     private String parse(String request) {
-        val contentAndTail = request.split("\r\n", 2);
-        val methodAndPath = contentAndTail[0].split(" ");
-        val method = methodAndPath[0];
-        val path = methodAndPath[1];
+        String[] contentAndTail = request.split("\r\n", 2);
+        String[] methodAndPath = contentAndTail[0].split(" ");
+        String method = methodAndPath[0];
+        String path = methodAndPath[1];
 
         switch (HttpMethod.valueOf(method)) {
             case GET:

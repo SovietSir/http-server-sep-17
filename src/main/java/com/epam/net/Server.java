@@ -26,8 +26,8 @@ public class Server {
     }
 
     public void start() {
-        try (val serverSocketChannel = openAndBind(port);
-             val selector = Selector.open()) {
+        try (ServerSocketChannel serverSocketChannel = openAndBind(port);
+             Selector selector = Selector.open()) {
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
             while (!Thread.currentThread().isInterrupted()) {
                 selector.select();
@@ -50,7 +50,7 @@ public class Server {
     }
 
     private ServerSocketChannel openAndBind(int port) throws IOException {
-        val serverSocketChannel = ServerSocketChannel.open();
+        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.bind(new InetSocketAddress(port));
         serverSocketChannel.configureBlocking(false);
         return serverSocketChannel;
@@ -58,9 +58,9 @@ public class Server {
 
     private void accept(SelectionKey key) {
         try {
-            val socketChannel = ((ServerSocketChannel) key.channel()).accept();
+            SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
             socketChannel.configureBlocking(false);
-            val newKey = socketChannel.register(key.selector(), SelectionKey.OP_READ);
+            SelectionKey newKey = socketChannel.register(key.selector(), SelectionKey.OP_READ);
             newKey.attach(ByteBuffer.allocateDirect(bufferCapacity));
             log.info(String.format("Accepted {%s}", socketChannel));
         } catch (IOException e) {
@@ -74,7 +74,7 @@ public class Server {
         val buffer = (ByteBuffer) key.attachment();
         //лайтовая версия - считаем, что считали сразу все нужные байты
         //TODO: проверять на получение всего сообщения (либо нужной части)
-        val bytesRead = socketChannel.read(buffer);
+        int bytesRead = socketChannel.read(buffer);
         if (bytesRead == -1 && buffer.position() == 0) return;
         log.debug(String.format("Received %d bytes", bytesRead));
         buffer.flip();
@@ -95,7 +95,7 @@ public class Server {
 
             String response = respondent.getResponse(request);
             log.debug(String.format("Response: %s", response));
-            val responseBytes = response.getBytes();
+            byte[] responseBytes = response.getBytes();
             for (int i = 0; i < responseBytes.length; i += bufferCapacity) {
                 int limit = i + bufferCapacity;
                 if (limit > responseBytes.length) limit = responseBytes.length;
