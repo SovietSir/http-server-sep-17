@@ -5,5 +5,5 @@ import com.epam.model.League;
 import java.util.List;
 
 public interface LeagueDAO extends DAOCrud<League, Long> {
-    abstract List<League> getAll();
+    List<League> getAll();
 }
