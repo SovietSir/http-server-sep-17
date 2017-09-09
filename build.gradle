@@ -12,5 +12,8 @@ repositories {
 dependencies {
     compile 'org.apache.logging.log4j:log4j-core:+',
             'io.vavr:vavr:0.9.0'
+
     compileOnly 'org.projectlombok:lombok:+'
+
+    testCompile 'org.junit.jupiter:junit-jupiter-api:+'
 }
