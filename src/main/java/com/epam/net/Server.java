@@ -35,16 +35,16 @@ public class Server {
             while (!Thread.currentThread().isInterrupted()) {
                 selector.select();
                 Set<SelectionKey> keys = selector.selectedKeys();
-                keys.forEach(this::execute);
+                keys.stream()
+                        .filter(SelectionKey::isValid)
+                        .forEach(this::execute);
                 keys.clear();
             }
         }
     }
 
     private void execute(SelectionKey key) {
-        if (!key.isValid())
-            log.debug("Key is not valid");
-        else if (key.isAcceptable()) accept(key);
+        if (key.isAcceptable()) accept(key);
         else if (key.isReadable()) read(key);
         else if (key.isWritable()) write(key);
     }
