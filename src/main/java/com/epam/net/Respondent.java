@@ -1,18 +1,25 @@
 package com.epam.net;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.vavr.Tuple2;
 import lombok.val;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 class Respondent {
     private static final String[] PATHS =
             {"leagues", "events", "offers", "users", "bets"};
+
     static {
         Arrays.sort(PATHS);
     }
+
+    private final Gson gson = new GsonBuilder().create();
 
     String getResponse(String request) {
         String[] contentAndTail = request.split("\r\n", 2);
@@ -104,6 +111,32 @@ class Respondent {
 
     private String respondOnDELETE(List<Tuple2<String, Long>> tuples) {
         return null;
+    }
+
+    /**
+     * Do the routine work with interaction with DAO
+     *
+     * @param tuples     list of tuples, containing parsed path
+     * @param levelOne   function that should be called if path
+     *                   is first level (e.g. "/leagues")
+     * @param levelTwo   function that should be called if path
+     *                   is second level (e.g. "/leagues/100")
+     * @param levelThree function that should be called if path
+     *                   is third level (e.g. "/leagues/100/events")
+     * @return generated JSON
+     */
+    String touchDAO(List<Tuple2<String, Long>> tuples,
+                    Supplier<Object> levelOne,
+                    Function<Long, Object> levelTwo,
+                    Function<Long, Object> levelThree) {
+        Tuple2<String, Long> tuple = tuples.get(0);
+        if (tuples.size() == 1) {
+            if (tuple._2 == null) {
+                return gson.toJson(levelOne.get());
+            }
+            return gson.toJson(levelTwo.apply(tuple._2));
+        }
+        return gson.toJson(levelThree.apply(tuple._2));
     }
 
     private String createResponse(String code) {
