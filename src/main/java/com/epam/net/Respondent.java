@@ -9,6 +9,7 @@ import lombok.val;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -103,8 +104,47 @@ class Respondent {
         }
     }
 
+    //TODO: remove this annotation later
+    @SuppressWarnings("ConstantConditions")
     private String respondOnGET(List<Tuple2<String, Long>> tuples) {
-        return "{\"method\": \"GET\"}";
+        try {
+            switch (tuples.get(0)._1) {
+                case "leagues":
+                    return createResponseOK(
+                            touchDAO(tuples,
+                                    leagueDAO::readAll,
+                                    leagueDAO::readById,
+                                    eventDAO::readEventsByLeagueId));
+                case "events":
+                    return createResponseOK(
+                            touchDAO(tuples,
+                                    eventDAO::readAll,
+                                    eventDAO::readById,
+                                    offerDAO::readOffersByEventId));
+                case "offers":
+                    return createResponseOK(
+                            touchDAO(tuples,
+                                    null,
+                                    offerDAO::readById,
+                                    betDAO::readBetsByOfferId));
+                case "users":
+                    return createResponseOK(
+                            touchDAO(tuples,
+                                    userDAO::readAll,
+                                    userDAO::readById,
+                                    betDAO::readBetsByUserId));
+                case "bets":
+                    return createResponseOK(
+                            touchDAO(tuples,
+                                    null,
+                                    betDAO::readById,
+                                    null));
+            }
+        } catch (NoSuchElementException e) {
+            return createResponse(HttpCodes.NOT_FOUND);
+        } catch (NullPointerException ignored) {
+        }
+        return createResponse(HttpCodes.BAD_REQUEST);
     }
 
     private String respondOnPOST(List<Tuple2<String, Long>> tuples, String body) {
@@ -134,15 +174,20 @@ class Respondent {
     String touchDAO(List<Tuple2<String, Long>> tuples,
                     Supplier<Object> levelOne,
                     Function<Long, Object> levelTwo,
-                    Function<Long, Object> levelThree) {
+                    Function<Long, Object> levelThree) throws NullPointerException {
+        String json;
         Tuple2<String, Long> tuple = tuples.get(0);
         if (tuples.size() == 1) {
             if (tuple._2 == null) {
-                return gson.toJson(levelOne.get());
+                json = gson.toJson(levelOne.get());
+            } else {
+                json = gson.toJson(levelTwo.apply(tuple._2));
             }
-            return gson.toJson(levelTwo.apply(tuple._2));
+        } else {
+            json = gson.toJson(levelThree.apply(tuple._2));
         }
-        return gson.toJson(levelThree.apply(tuple._2));
+        if (json == null) throw new NoSuchElementException();
+        return json;
     }
 
     private String createResponse(String code) {
@@ -153,5 +198,9 @@ class Respondent {
         return String.format(
                 "HTTP/1.1 %s\r\nContent-Type: application/json\r\n\r\n%s",
                 code, JSON);
+    }
+
+    private String createResponseOK(String JSON) {
+        return createResponse(HttpCodes.OK, JSON);
     }
 }
