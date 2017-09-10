@@ -1,5 +1,6 @@
 package com.epam.net;
 
+import com.epam.daoInterfaces.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.vavr.Tuple2;
@@ -20,6 +21,11 @@ class Respondent {
     }
 
     private final Gson gson = new GsonBuilder().create();
+    private final LeagueDAO leagueDAO = null;
+    private final EventDAO eventDAO = null;
+    private final OfferDAO offerDAO = null;
+    private final UserDAO userDAO = null;
+    private final BetDAO betDAO = null;
 
     String getResponse(String request) {
         String[] contentAndTail = request.split("\r\n", 2);
