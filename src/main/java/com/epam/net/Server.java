@@ -29,7 +29,7 @@ public class Server {
     @SneakyThrows
     public void start() {
         log.info(() -> String.format("Server started, please visit: http://localhost:%s%n", port));
-        try (ServerSocketChannel serverSocketChannel = openAndBind(port);
+        try (ServerSocketChannel serverSocketChannel = openAndBindChannel(port);
              Selector selector = Selector.open()) {
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
             while (!Thread.currentThread().isInterrupted()) {
@@ -42,22 +42,17 @@ public class Server {
     }
 
     private void execute(SelectionKey key) {
-        if (!key.isValid()) {
+        if (!key.isValid())
             log.debug("Key is not valid");
-        } else if (key.isAcceptable()) {
-            accept(key);
-        } else if (key.isReadable()) {
-            read(key);
-        } else if (key.isWritable()) {
-            write(key);
-        }
+        else if (key.isAcceptable()) accept(key);
+        else if (key.isReadable()) read(key);
+        else if (key.isWritable()) write(key);
     }
 
-    private ServerSocketChannel openAndBind(int port) throws IOException {
-        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-        serverSocketChannel.bind(new InetSocketAddress(port));
-        serverSocketChannel.configureBlocking(false);
-        return serverSocketChannel;
+    private ServerSocketChannel openAndBindChannel(int port) throws IOException {
+        return (ServerSocketChannel) ServerSocketChannel.open()
+                .bind(new InetSocketAddress(port))
+                .configureBlocking(false);
     }
 
     private void accept(SelectionKey key) {
