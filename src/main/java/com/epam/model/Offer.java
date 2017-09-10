@@ -1,9 +1,10 @@
 package com.epam.model;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
 
-@Value
+@AllArgsConstructor
 public class Offer {
+    private long id;
     private long event_id;
     private String description;
     private float coefficient;

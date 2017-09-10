@@ -1,9 +1,10 @@
 package com.epam.model;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
 
-@Value
+@AllArgsConstructor
 public class Bet {
+    private long id;
     private long offer_id;
     private long user_id;
     private int amount;

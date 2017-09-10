@@ -1,8 +1,9 @@
 package com.epam.model;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
 
-@Value
+@AllArgsConstructor
 public class League {
+    private long id;
     private String name;
 }
