@@ -12,6 +12,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
+import java.util.Set;
 
 @SuppressWarnings("WeakerAccess")
 @Log4j2
@@ -31,21 +32,24 @@ public class Server {
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
             while (!Thread.currentThread().isInterrupted()) {
                 selector.select();
-                selector.selectedKeys().removeIf(key -> {
-                    if (!key.isValid()) {
-                        log.debug("Key is not valid");
-                    } else if (key.isAcceptable()) {
-                        accept(key);
-                    } else if (key.isReadable()) {
-                        read(key);
-                    } else if (key.isWritable()) {
-                        write(key);
-                    }
-                    return true;
-                });
+                Set<SelectionKey> keys = selector.selectedKeys();
+                keys.forEach(this::execute);
+                keys.clear();
             }
         } catch (IOException e) {
             log.error(e.getMessage());
+        }
+    }
+
+    private void execute(SelectionKey key) {
+        if (!key.isValid()) {
+            log.debug("Key is not valid");
+        } else if (key.isAcceptable()) {
+            accept(key);
+        } else if (key.isReadable()) {
+            read(key);
+        } else if (key.isWritable()) {
+            write(key);
         }
     }
 
