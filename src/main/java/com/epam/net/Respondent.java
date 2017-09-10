@@ -14,6 +14,8 @@ import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+//TODO: remove this annotation later
+@SuppressWarnings("ConstantConditions")
 class Respondent {
     private static final String[] PATHS =
             {"leagues", "events", "offers", "users", "bets"};
@@ -105,8 +107,6 @@ class Respondent {
         }
     }
 
-    //TODO: remove this annotation later
-    @SuppressWarnings("ConstantConditions")
     private String respondOnGET(List<Tuple2<String, Long>> tuples) {
         try {
             switch (tuples.get(0)._1) {
@@ -148,13 +148,35 @@ class Respondent {
         return createResponse(HttpCodes.BAD_REQUEST);
     }
 
+    //TODO: handle exceptions (incorrect json syntax or logic)
     private String respondOnPOST(List<Tuple2<String, Long>> tuples, String body) {
-        return null;
+        if (!(tuples.size() == 1 && tuples.get(0)._2 != null)) {
+            return createResponse(HttpCodes.BAD_REQUEST);
+        }
+        Tuple2<String, Long> tuple = tuples.get(0);
+        switch (tuple._1) {
+            case "leagues":
+                leagueDAO.update(tuple._2, gson.fromJson(body, League.class));
+                break;
+            case "events":
+                eventDAO.update(tuple._2, gson.fromJson(body, Event.class));
+                break;
+            case "offers":
+                offerDAO.update(tuple._2, gson.fromJson(body, Offer.class));
+                break;
+            case "users":
+                userDAO.update(tuple._2, gson.fromJson(body, User.class));
+                break;
+            case "bets":
+                betDAO.update(tuple._2, gson.fromJson(body, Bet.class));
+                break;
+            default:
+                return createResponse(HttpCodes.BAD_REQUEST);
+        }
+        return createResponse(HttpCodes.OK);
     }
 
     //TODO: handle exceptions (incorrect json syntax or logic)
-    //TODO: remove this annotation later
-    @SuppressWarnings("ConstantConditions")
     private String respondOnPUT(List<Tuple2<String, Long>> tuples, String body) {
         if (!(tuples.size() == 1 && tuples.get(0)._2 == null)) {
             return createResponse(HttpCodes.BAD_REQUEST);
@@ -181,8 +203,6 @@ class Respondent {
         return createResponse(HttpCodes.OK);
     }
 
-    //TODO: remove this annotation later
-    @SuppressWarnings("ConstantConditions")
     private String respondOnDELETE(List<Tuple2<String, Long>> tuples) {
         if (!(tuples.size() == 1 && tuples.get(0)._2 != null)) {
             return createResponse(HttpCodes.BAD_REQUEST);
