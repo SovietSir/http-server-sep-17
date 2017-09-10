@@ -22,7 +22,7 @@ digraph meeting_rooms_db {
                 <tr><td port="l_id" border="1">league_id</td></tr>
                 <tr><td border="1">date</td></tr>
                 <tr><td border="1">home_team</td></tr>
-                <tr><td border="1">coming_team</td></tr>
+                <tr><td border="1">guest_team</td></tr>
                 <tr><td border="1">score</td></tr>
             </table>>
   ]
