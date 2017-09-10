@@ -26,6 +26,7 @@ public class Server {
         this.bufferCapacity = bufferCapacity;
     }
 
+    @SneakyThrows
     public void start() {
         log.info(() -> String.format("Server started, please visit: http://localhost:%s%n", port));
         try (ServerSocketChannel serverSocketChannel = openAndBind(port);
@@ -37,8 +38,6 @@ public class Server {
                 keys.forEach(this::execute);
                 keys.clear();
             }
-        } catch (IOException e) {
-            log.error(e.getMessage());
         }
     }
 
