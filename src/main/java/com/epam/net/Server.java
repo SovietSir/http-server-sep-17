@@ -27,6 +27,7 @@ public class Server {
     }
 
     public void start() {
+        log.info(() -> String.format("Server started, please visit: http://localhost:%s%n", port));
         try (ServerSocketChannel serverSocketChannel = openAndBind(port);
              Selector selector = Selector.open()) {
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -66,9 +67,9 @@ public class Server {
             socketChannel.configureBlocking(false);
             SelectionKey newKey = socketChannel.register(key.selector(), SelectionKey.OP_READ);
             newKey.attach(ByteBuffer.allocateDirect(bufferCapacity));
-            log.info(String.format("Accepted {%s}", socketChannel));
+            log.info(() -> String.format("Accepted {%s}", socketChannel));
         } catch (IOException e) {
-            log.error("Error while accepting");
+            log.error("Error while accepting", e);
         }
     }
 
@@ -80,7 +81,7 @@ public class Server {
         //TODO: проверять на получение всего сообщения (либо нужной части)
         int bytesRead = socketChannel.read(buffer);
         if (bytesRead == -1 && buffer.position() == 0) return;
-        log.debug(String.format("Received %d bytes", bytesRead));
+        log.debug(() -> String.format("Received %d bytes", bytesRead));
         buffer.flip();
         key.interestOps(SelectionKey.OP_WRITE);
     }
@@ -94,11 +95,11 @@ public class Server {
             val requestBytes = new byte[buffer.limit()];
             buffer.get(requestBytes, 0, buffer.limit());
             val request = new String(requestBytes);
-            log.debug(String.format("Request: %s", request));
+            log.debug(() -> String.format("Request: %s", request));
             buffer.clear();
 
             String response = respondent.getResponse(request);
-            log.debug(String.format("Response: %s", response));
+            log.debug(() -> String.format("Response: %s", response));
             byte[] responseBytes = response.getBytes();
             for (int i = 0; i < responseBytes.length; i += bufferCapacity) {
                 int limit = i + bufferCapacity;
