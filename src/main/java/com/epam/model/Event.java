@@ -7,7 +7,6 @@ import java.time.Instant;
 
 @Value
 public class Event {
-    private long id;
     private Instant date;
     private String homeTeam;
     private String comingTeam;

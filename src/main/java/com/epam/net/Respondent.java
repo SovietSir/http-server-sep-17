@@ -1,6 +1,7 @@
 package com.epam.net;
 
 import com.epam.daoInterfaces.*;
+import com.epam.model.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.vavr.Tuple2;
@@ -151,8 +152,33 @@ class Respondent {
         return null;
     }
 
+    //TODO: handle exceptions (incorrect json syntax or logic)
+    //TODO: remove this annotation later
+    @SuppressWarnings("ConstantConditions")
     private String respondOnPUT(List<Tuple2<String, Long>> tuples, String body) {
-        return null;
+        if (!(tuples.size() == 1 && tuples.get(0)._2 == null)) {
+            return createResponse(HttpCodes.BAD_REQUEST);
+        }
+        switch (tuples.get(0)._1) {
+            case "leagues":
+                leagueDAO.create(gson.fromJson(body, League.class));
+                break;
+            case "events":
+                eventDAO.create(gson.fromJson(body, Event.class));
+                break;
+            case "offers":
+                offerDAO.create(gson.fromJson(body, Offer.class));
+                break;
+            case "users":
+                userDAO.create(gson.fromJson(body, User.class));
+                break;
+            case "bets":
+                betDAO.create(gson.fromJson(body, Bet.class));
+                break;
+            default:
+                return createResponse(HttpCodes.BAD_REQUEST);
+        }
+        return createResponse(HttpCodes.OK);
     }
 
     private String respondOnDELETE(List<Tuple2<String, Long>> tuples) {
@@ -171,10 +197,10 @@ class Respondent {
      *                   is third level (e.g. "/leagues/100/events")
      * @return generated JSON
      */
-    String touchDAO(List<Tuple2<String, Long>> tuples,
+    private String touchDAO(List<Tuple2<String, Long>> tuples,
                     Supplier<Object> levelOne,
                     Function<Long, Object> levelTwo,
-                    Function<Long, Object> levelThree) throws NullPointerException {
+                    Function<Long, Object> levelThree) {
         String json;
         Tuple2<String, Long> tuple = tuples.get(0);
         if (tuples.size() == 1) {

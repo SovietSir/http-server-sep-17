@@ -5,7 +5,7 @@ interface DAOCrud<Value, Id> {
 
     Value readById(Id id);
 
-    void update(Value value);
+    void update(Id id, Value value);
 
     void deleteById(Id id);
 }
