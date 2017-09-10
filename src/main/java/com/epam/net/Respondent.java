@@ -181,8 +181,33 @@ class Respondent {
         return createResponse(HttpCodes.OK);
     }
 
+    //TODO: remove this annotation later
+    @SuppressWarnings("ConstantConditions")
     private String respondOnDELETE(List<Tuple2<String, Long>> tuples) {
-        return null;
+        if (!(tuples.size() == 1 && tuples.get(0)._2 != null)) {
+            return createResponse(HttpCodes.BAD_REQUEST);
+        }
+        Tuple2<String, Long> tuple = tuples.get(0);
+        switch (tuple._1) {
+            case "leagues":
+                leagueDAO.deleteById(tuple._2);
+                break;
+            case "events":
+                eventDAO.deleteById(tuple._2);
+                break;
+            case "offers":
+                offerDAO.deleteById(tuple._2);
+                break;
+            case "users":
+                userDAO.deleteById(tuple._2);
+                break;
+            case "bets":
+                betDAO.deleteById(tuple._2);
+                break;
+            default:
+                return createResponse(HttpCodes.BAD_REQUEST);
+        }
+        return createResponse(HttpCodes.OK);
     }
 
     /**
