@@ -22,6 +22,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql STABLE;
 
+CREATE OR REPLACE FUNCTION select_events_by_league_id(event_league_id BIGINT)
+  RETURNS SETOF EVENT AS $$
+BEGIN
+  RETURN QUERY SELECT
+                 id,
+                 league_id,
+                 date,
+                 home_team,
+                 guest_team,
+                 score
+               FROM event
+               WHERE league_id = event_league_id
+               ORDER BY id;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
 CREATE OR REPLACE FUNCTION select_event_by_id(event_id BIGINT)
   RETURNS SETOF EVENT AS $$
 BEGIN

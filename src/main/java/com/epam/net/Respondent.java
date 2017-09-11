@@ -1,7 +1,6 @@
 package com.epam.net;
 
-import com.epam.dao.EventDaoImpl;
-import com.epam.dao.LeagueDAOImpl;
+import com.epam.dao.*;
 import com.epam.daoInterfaces.*;
 import com.epam.model.*;
 import com.google.gson.Gson;
@@ -10,10 +9,7 @@ import io.vavr.Tuple2;
 import lombok.Setter;
 import lombok.val;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -22,18 +18,20 @@ import java.util.function.Supplier;
 @Setter
 class Respondent {
     private static final String[] PATHS =
-            {"leagues", "events", "offers", "users", "bets"};
+            {"leagues", "events", "offers", "persons", "bets"};
 
     static {
         Arrays.sort(PATHS);
     }
 
-    private final Gson gson = new GsonBuilder().create();
+    private final Gson gson = new GsonBuilder()
+            .setDateFormat("dd-MM-yyyy HH:mm")
+            .create();
     private LeagueDAO leagueDAO = new LeagueDAOImpl();
-    private EventDAO eventDAO = new EventDaoImpl();
-    private OfferDAO offerDAO = null;
-    private UserDAO userDAO = null;
-    private BetDAO betDAO = null;
+    private EventDAO eventDAO = new EventDAOImpl();
+    private OfferDAO offerDAO = new OfferDAOImpl();
+    private PersonDAO personDAO = new PersonDAOImpl();
+    private BetDAO betDAO = new BetDAOImpl();
 
     String getResponse(String request) {
         String[] contentAndTail = request.split("\r\n", 2);
@@ -132,12 +130,12 @@ class Respondent {
                                     null,
                                     offerDAO::readById,
                                     betDAO::readBetsByOfferId));
-                case "users":
+                case "persons":
                     return createResponseOK(
                             touchDAO(tuples,
-                                    userDAO::readAll,
-                                    userDAO::readById,
-                                    betDAO::readBetsByUserId));
+                                    personDAO::readAll,
+                                    personDAO::readById,
+                                    betDAO::readBetsByPersonId));
                 case "bets":
                     return createResponseOK(
                             touchDAO(tuples,
@@ -168,8 +166,8 @@ class Respondent {
             case "offers":
                 offerDAO.update(tuple._2, gson.fromJson(body, Offer.class));
                 break;
-            case "users":
-                userDAO.update(tuple._2, gson.fromJson(body, User.class));
+            case "persons":
+                personDAO.update(tuple._2, gson.fromJson(body, Person.class));
                 break;
             case "bets":
                 betDAO.update(tuple._2, gson.fromJson(body, Bet.class));
@@ -195,8 +193,8 @@ class Respondent {
             case "offers":
                 offerDAO.create(gson.fromJson(body, Offer.class));
                 break;
-            case "users":
-                userDAO.create(gson.fromJson(body, User.class));
+            case "persons":
+                personDAO.create(gson.fromJson(body, Person.class));
                 break;
             case "bets":
                 betDAO.create(gson.fromJson(body, Bet.class));
@@ -222,8 +220,8 @@ class Respondent {
             case "offers":
                 offerDAO.deleteById(tuple._2);
                 break;
-            case "users":
-                userDAO.deleteById(tuple._2);
+            case "persons":
+                personDAO.deleteById(tuple._2);
                 break;
             case "bets":
                 betDAO.deleteById(tuple._2);

@@ -1,17 +1,17 @@
 package com.epam.model;
 
-import io.vavr.Tuple2;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.Instant;
+import java.util.Date;
 
 @Getter
 @AllArgsConstructor
 public class Event {
     private long id;
-    private Instant date;
+    private long leagueId;
+    private Date date;
     private String homeTeam;
-    private String comingTeam;
-    private Tuple2<Byte, Byte> score;
+    private String guestTeam;
+    private String score;
 }
