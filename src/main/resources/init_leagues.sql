@@ -3,38 +3,6 @@ CREATE TABLE league (
   name VARCHAR(100) UNIQUE NOT NULL
 );
 
-CREATE TABLE event (
-  id         BIGSERIAL PRIMARY KEY,
-  league_id  BIGINT REFERENCES league (id),
-  date       TIMESTAMP   NOT NULL,
-  home_team  VARCHAR(50) NOT NULL,
-  guest_team VARCHAR(50) NOT NULL,
-  score      VARCHAR(10)
-);
-
-CREATE TABLE offer (
-  id          BIGSERIAL PRIMARY KEY,
-  event_id    BIGINT REFERENCES event (id),
-  description VARCHAR(100) NOT NULL,
-  coefficient FLOAT        NOT NULL,
-  result      BOOLEAN
-);
-
-CREATE TABLE person (
-  id            BIGSERIAL PRIMARY KEY,
-  login         VARCHAR(100) UNIQUE NOT NULL,
-  password_hash INT                 NOT NULL,
-  balance       BIGINT              NOT NULL
-);
-
-CREATE TABLE bet (
-  id        BIGSERIAL PRIMARY KEY,
-  person_id BIGINT REFERENCES person (id),
-  offer_id  BIGINT REFERENCES offer (id),
-  amount    BIGINT NOT NULL,
-  gain      FLOAT
-);
-
 CREATE OR REPLACE FUNCTION select_all_leagues()
   RETURNS SETOF LEAGUE AS $$
 BEGIN
