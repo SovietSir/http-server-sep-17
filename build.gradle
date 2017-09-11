@@ -18,5 +18,11 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok:+'
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:+'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:+',
+            'org.testng:testng:+'
+}
+
+test {
+    useTestNG() {
+    }
 }
