@@ -55,6 +55,7 @@ public class ConnectionPool implements AutoCloseable {
         executeSQL("src/main/resources/init_events.sql");
         executeSQL("src/main/resources/init_offers.sql");
         executeSQL("src/main/resources/init_persons.sql");
+        executeSQL("src/main/resources/init_bets.sql");
     }
 
     public void dropDatabase() {
