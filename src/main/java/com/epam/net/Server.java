@@ -14,6 +14,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 
 @SuppressWarnings("WeakerAccess")
 @Log4j2
@@ -21,6 +22,7 @@ public class Server {
     private final int port;
     private final int bufferCapacity;
     private final Respondent respondent = new Respondent();
+    ArrayBlockingQueue<SelectionKey> socketQueue = new ArrayBlockingQueue<>(1024);
 
     public Server(int port, int bufferCapacity) {
         this.port = port;
@@ -30,6 +32,7 @@ public class Server {
     @SneakyThrows
     public void start() {
         log.info(() -> String.format("Server started, please visit: http://localhost:%s%n", port));
+        startQueueExecutors();
         try (ServerSocketChannel serverSocketChannel = openAndBindChannel(port);
              Selector selector = Selector.open()) {
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -38,10 +41,26 @@ public class Server {
                 Set<SelectionKey> keys = selector.selectedKeys();
                 keys.stream()
                         .filter(SelectionKey::isValid)
+                        .filter(key -> !socketQueue.contains(key))
                         .forEach(this::execute);
                 keys.clear();
             }
         }
+    }
+
+    private void startQueueExecutors() {
+        Thread t = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                execute(getNextKey());
+            }
+        });
+        t.setDaemon(true);
+        t.start();
+    }
+
+    @SneakyThrows
+    private SelectionKey getNextKey() {
+        return socketQueue.take();
     }
 
     private void execute(SelectionKey key) {
