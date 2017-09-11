@@ -17,11 +17,11 @@ public class LeagueDAOImpl implements LeagueDAO {
     /**
      * SQL queries that calls stored procedures in database
      */
-    private static final String SELECT_ALL = "SELECT id, name FROM select_all()";
-    private static final String SELECT_BY_ID = "SELECT id, name FROM select_by_id(?)";
-    private static final String INSERT = "SELECT insert(?)";
-    private static final String DELETE = "SELECT delete(?)";
-    private static final String UPDATE = "SELECT update(?, ?)";
+    private static final String SELECT_ALL = "SELECT id, name FROM select_all_leagues()";
+    private static final String SELECT_BY_ID = "SELECT id, name FROM select_league_by_id(?)";
+    private static final String INSERT = "SELECT insert_league(?)";
+    private static final String DELETE = "SELECT delete_league(?)";
+    private static final String UPDATE = "SELECT update_league(?, ?)";
 
     @SneakyThrows
     @Override
@@ -68,7 +68,7 @@ public class LeagueDAOImpl implements LeagueDAO {
     public void update(Long id, League league) {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE)) {
-            preparedStatement.setLong(1, league.getId());
+            preparedStatement.setLong(1, id);
             preparedStatement.setString(2, league.getName());
             preparedStatement.execute();
         }
