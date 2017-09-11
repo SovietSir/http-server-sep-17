@@ -1,5 +1,6 @@
 package com.epam.net;
 
+import com.epam.store.ConnectionPool;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import lombok.val;
@@ -89,11 +90,11 @@ public class Server {
             val requestBytes = new byte[buffer.limit()];
             buffer.get(requestBytes, 0, buffer.limit());
             val request = new String(requestBytes);
-            log.debug(() -> String.format("Request: %s", request));
+            log.debug(() -> String.format("Request:%n%s", request));
             buffer.clear();
 
             String response = respondent.getResponse(request);
-            log.debug(() -> String.format("Response: %s", response));
+            log.debug(() -> String.format("Response:%n%s", response));
             byte[] responseBytes = response.getBytes();
             for (int i = 0; i < responseBytes.length; i += bufferCapacity) {
                 int limit = i + bufferCapacity;
@@ -107,6 +108,8 @@ public class Server {
     }
 
     public static void main(String[] args) {
+        ConnectionPool.pool.dropDatabase();
+        ConnectionPool.pool.initDatabase();
         new Server(1024, 1024).start();
     }
 }

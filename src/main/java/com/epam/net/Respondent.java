@@ -1,5 +1,7 @@
 package com.epam.net;
 
+import com.epam.dao.EventDaoImpl;
+import com.epam.dao.LeagueDAOImpl;
 import com.epam.daoInterfaces.*;
 import com.epam.model.*;
 import com.google.gson.Gson;
@@ -27,8 +29,8 @@ class Respondent {
     }
 
     private final Gson gson = new GsonBuilder().create();
-    private LeagueDAO leagueDAO = null;
-    private EventDAO eventDAO = null;
+    private LeagueDAO leagueDAO = new LeagueDAOImpl();
+    private EventDAO eventDAO = new EventDaoImpl();
     private OfferDAO offerDAO = null;
     private UserDAO userDAO = null;
     private BetDAO betDAO = null;

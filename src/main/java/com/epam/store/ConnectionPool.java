@@ -4,9 +4,13 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 import lombok.SneakyThrows;
 
 import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class ConnectionPool implements AutoCloseable {
     /**
@@ -45,6 +49,26 @@ public class ConnectionPool implements AutoCloseable {
         cpds.setMaxPoolSize(maxPoolSize);
         cpds.setAcquireIncrement(1);
     }
+
+    public void initDatabase() {
+        executeSQL("src/main/resources/init.sql");
+    }
+
+    public void dropDatabase() {
+        executeSQL("src/main/resources/drop.sql");
+    }
+
+    @SneakyThrows
+    private void executeSQL(String file) {
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement()) {
+            String query = Files.lines(Paths.get(file))
+                    .filter(line -> !line.startsWith("--")) //comments
+                    .collect(Collectors.joining(" "));
+            statement.execute(query);
+        }
+    }
+
 
     @SneakyThrows
     public Connection getConnection() {
