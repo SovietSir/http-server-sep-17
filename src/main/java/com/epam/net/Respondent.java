@@ -5,6 +5,7 @@ import com.epam.model.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.vavr.Tuple2;
+import lombok.Setter;
 import lombok.val;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.function.Supplier;
 
 //TODO: remove this annotation later
 @SuppressWarnings("ConstantConditions")
+@Setter
 class Respondent {
     private static final String[] PATHS =
             {"leagues", "events", "offers", "users", "bets"};
@@ -25,11 +27,11 @@ class Respondent {
     }
 
     private final Gson gson = new GsonBuilder().create();
-    private final LeagueDAO leagueDAO = null;
-    private final EventDAO eventDAO = null;
-    private final OfferDAO offerDAO = null;
-    private final UserDAO userDAO = null;
-    private final BetDAO betDAO = null;
+    private LeagueDAO leagueDAO = null;
+    private EventDAO eventDAO = null;
+    private OfferDAO offerDAO = null;
+    private UserDAO userDAO = null;
+    private BetDAO betDAO = null;
 
     String getResponse(String request) {
         String[] contentAndTail = request.split("\r\n", 2);
