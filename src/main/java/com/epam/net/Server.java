@@ -1,6 +1,5 @@
 package com.epam.net;
 
-import com.epam.store.ConnectionPool;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import lombok.val;
@@ -107,7 +106,7 @@ public class Server implements Runnable {
         val buffer = (ByteBuffer) key.attachment();
         String request = getRequest(buffer);
         log.debug(() -> String.format("Request:%n%s", request));
-        String response = respondent.getResponse(request);
+        String response = respondent.getResponse(request).toString();
         log.debug(() -> String.format("Response:%n%s", response));
         writeResponse(response, buffer, key);
     }
