@@ -125,8 +125,7 @@ public class Server implements Runnable {
         try (val socketChannel = (SocketChannel) key.channel()) {
             byte[] responseBytes = response.getBytes();
             for (int i = 0; i < responseBytes.length; i += bufferCapacity) {
-                int limit = i + bufferCapacity;
-                if (limit > responseBytes.length) limit = responseBytes.length;
+                int limit = Math.min(i + bufferCapacity, responseBytes.length);
                 buffer.put(Arrays.copyOfRange(responseBytes, i, limit));
                 buffer.flip();
                 socketChannel.write(buffer);
