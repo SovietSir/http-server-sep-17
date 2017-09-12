@@ -28,6 +28,7 @@ class HttpResponse {
         if (body != null) {
             sb.append(String.format("%n%n%s", body));
         }
+        sb.append(String.format("%n%n"));
         return sb.toString();
     }
 }
