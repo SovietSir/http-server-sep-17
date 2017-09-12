@@ -14,7 +14,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 
 @SuppressWarnings("WeakerAccess")
 @Log4j2
@@ -22,7 +21,7 @@ public class Server {
     private final int port;
     private final int bufferCapacity;
     private final Respondent respondent = new Respondent();
-    ArrayBlockingQueue<SelectionKey> socketQueue = new ArrayBlockingQueue<>(1024);
+    private final NoDuplicatingBlockingQueue queue = new NoDuplicatingBlockingQueue();
 
     public Server(int port, int bufferCapacity) {
         this.port = port;
@@ -37,12 +36,12 @@ public class Server {
              Selector selector = Selector.open()) {
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
             while (!Thread.currentThread().isInterrupted()) {
-                selector.select();
+                selector.selectNow();
                 Set<SelectionKey> keys = selector.selectedKeys();
                 keys.stream()
                         .filter(SelectionKey::isValid)
-                        .filter(key -> !socketQueue.contains(key))
-                        .forEach(this::execute);
+                        .filter(key -> !queue.contains(key))
+                        .forEach(queue::add);
                 keys.clear();
             }
         }
@@ -51,22 +50,22 @@ public class Server {
     private void startQueueExecutors() {
         Thread t = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
-                execute(getNextKey());
+                SelectionKey key = queue.getKeyToExecute();
+                execute(key);
             }
         });
         t.setDaemon(true);
         t.start();
     }
 
-    @SneakyThrows
-    private SelectionKey getNextKey() {
-        return socketQueue.take();
-    }
-
     private void execute(SelectionKey key) {
-        if (key.isAcceptable()) accept(key);
-        else if (key.isReadable()) read(key);
-        else if (key.isWritable()) write(key);
+        try {
+            if (key.isAcceptable()) accept(key);
+            else if (key.isReadable()) read(key);
+            else if (key.isWritable()) write(key);
+        } finally {
+            queue.removeExecutedKey(key);
+        }
     }
 
     private ServerSocketChannel openAndBindChannel(int port) throws IOException {
