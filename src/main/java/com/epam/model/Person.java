@@ -9,5 +9,5 @@ public class Person {
     private long id;
     private String login;
     private int passwordHash;
-    private int balance;
+    private long balance;
 }
