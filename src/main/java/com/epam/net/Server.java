@@ -136,8 +136,6 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        ConnectionPool.pool.dropDatabase();
-        ConnectionPool.pool.initDatabase();
         new Server(1024, 1024).start();
     }
 }
