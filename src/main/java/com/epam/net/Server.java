@@ -77,25 +77,32 @@ public class Server {
 
     @SneakyThrows
     private void accept(SelectionKey key) {
-            SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
-            socketChannel.configureBlocking(false);
-            SelectionKey newKey = socketChannel.register(key.selector(), SelectionKey.OP_READ);
-            newKey.attach(ByteBuffer.allocateDirect(bufferCapacity));
-            log.info(() -> String.format("Accepted {%s}", socketChannel));
+        SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
+        socketChannel.configureBlocking(false);
+        SelectionKey newKey = socketChannel.register(key.selector(), SelectionKey.OP_READ);
+        newKey.attach(ByteBuffer.allocateDirect(bufferCapacity));
+        log.info(() -> String.format("Accepted {%s}", socketChannel));
     }
 
     @SneakyThrows
     private void read(SelectionKey key) {
         val socketChannel = (SocketChannel) key.channel();
         val buffer = (ByteBuffer) key.attachment();
-        //лайтовая версия - считаем, что считали сразу все нужные байты
-        int bytesRead = socketChannel.read(buffer);
-        if (bytesRead == -1 && buffer.position() == 0) return;
-        log.debug(() -> String.format("Received %d bytes", bytesRead));
+        int sumBytesRead = 0;
+        for (int bytesRead = 1; bytesRead > 0 && buffer.hasRemaining(); ) {
+            bytesRead = socketChannel.read(buffer);
+            sumBytesRead += bytesRead;
+        }
+        logReadBytes(sumBytesRead);
         buffer.flip();
         key.interestOps(SelectionKey.OP_WRITE);
     }
 
+    private void logReadBytes(int bytes) {
+        log.debug(() -> String.format("Received %d bytes", bytes));
+    }
+
+    //TODO: рассмотреть ситуацию Connection: keep-alive (не закрывать канал каждый раз)
     @SneakyThrows
     private void write(SelectionKey key) {
         //channel closes here
