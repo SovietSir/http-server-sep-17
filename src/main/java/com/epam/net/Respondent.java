@@ -3,21 +3,19 @@ package com.epam.net;
 import com.epam.dao.*;
 import com.epam.daoInterfaces.*;
 import com.epam.model.*;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import io.vavr.Tuple2;
 import lombok.Setter;
 import lombok.val;
 
-import java.lang.reflect.Type;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-//TODO: remove this annotation later
 @SuppressWarnings("ConstantConditions")
 @Setter
 class Respondent {
@@ -157,7 +155,6 @@ class Respondent {
         return new HttpResponse(HttpCodes.BAD_REQUEST);
     }
 
-    //TODO: handle exceptions (incorrect json syntax or logic)
     private HttpResponse respondOnPOST(List<Tuple2<String, Long>> tuples, String body) {
         if (!(tuples.size() == 1 && tuples.get(0)._2 != null)) {
             return new HttpResponse(HttpCodes.BAD_REQUEST);
@@ -185,7 +182,6 @@ class Respondent {
         return new HttpResponse(HttpCodes.OK);
     }
 
-    //TODO: handle exceptions (incorrect json syntax or logic)
     private HttpResponse respondOnPUT(List<Tuple2<String, Long>> tuples, String body) {
         if (!(tuples.size() == 1 && tuples.get(0)._2 == null)) {
             return new HttpResponse(HttpCodes.BAD_REQUEST);

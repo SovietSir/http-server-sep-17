@@ -73,7 +73,6 @@ public class Server {
         val socketChannel = (SocketChannel) key.channel();
         val buffer = (ByteBuffer) key.attachment();
         //лайтовая версия - считаем, что считали сразу все нужные байты
-        //TODO: проверять на получение всего сообщения (либо нужной части)
         int bytesRead = socketChannel.read(buffer);
         if (bytesRead == -1 && buffer.position() == 0) return;
         log.debug(() -> String.format("Received %d bytes", bytesRead));
@@ -81,7 +80,6 @@ public class Server {
         key.interestOps(SelectionKey.OP_WRITE);
     }
 
-    //TODO: рассмотреть ситуацию Connection: keep-alive (не закрывать канал каждый раз)
     @SneakyThrows
     private void write(SelectionKey key) {
         //channel closes here
