@@ -20,6 +20,36 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql STABLE;
 
+CREATE OR REPLACE FUNCTION select_bets_by_person_id(bet_person_id BIGINT)
+  RETURNS SETOF BET AS $$
+BEGIN
+  RETURN QUERY SELECT
+                 id,
+                 person_id,
+                 offer_id,
+                 amount,
+                 gain
+               FROM bet
+               WHERE person_id = bet_person_id
+               ORDER BY id;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+CREATE OR REPLACE FUNCTION select_bets_by_offer_id(bet_offer_id BIGINT)
+  RETURNS SETOF BET AS $$
+BEGIN
+  RETURN QUERY SELECT
+                 id,
+                 person_id,
+                 offer_id,
+                 amount,
+                 gain
+               FROM bet
+               WHERE offer_id = bet_offer_id
+               ORDER BY id;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
 CREATE OR REPLACE FUNCTION select_bet_by_id(bet_id BIGINT)
   RETURNS SETOF BET AS $$
 BEGIN

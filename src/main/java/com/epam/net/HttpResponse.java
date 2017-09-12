@@ -1,11 +1,13 @@
 package com.epam.net;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.val;
 
 import java.util.Map;
 
+@EqualsAndHashCode
 @AllArgsConstructor
 class HttpResponse {
     @NonNull private HttpCodes code;

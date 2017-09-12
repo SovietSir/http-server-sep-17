@@ -17,7 +17,7 @@ public class EventDAOImpl implements EventDAO {
     private static final String SELECT_ALL =
             "SELECT id, league_id, date, home_team, guest_team, score FROM select_all_events()";
     private static final String SELECT_BY_LEAGUE_ID =
-            "SELECT id, league_id, date, home_team, guest_team, score FROM select_all_events(?)";
+            "SELECT id, league_id, date, home_team, guest_team, score FROM select_events_by_league_id(?)";
     private static final String SELECT_BY_ID =
             "SELECT id, league_id, date, home_team, guest_team, score FROM select_event_by_id(?)";
     private static final String INSERT = "SELECT insert_event(?, ?, ?, ?, ?)";
