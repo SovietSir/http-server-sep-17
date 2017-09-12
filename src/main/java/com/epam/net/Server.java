@@ -32,6 +32,7 @@ public class Server {
 
     @SneakyThrows
     public void start() {
+        log.info("Server loading...");
         startQueueExecutors();
         try (ServerSocketChannel serverSocketChannel = openAndBindChannel(port);
              Selector selector = Selector.open()) {
