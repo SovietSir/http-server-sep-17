@@ -32,11 +32,11 @@ public class Server {
 
     @SneakyThrows
     public void start() {
-        log.info(() -> String.format("Server started, please visit: http://localhost:%s%n", port));
         startQueueExecutors();
         try (ServerSocketChannel serverSocketChannel = openAndBindChannel(port);
              Selector selector = Selector.open()) {
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+            log.info(() -> String.format("Server started, please visit: http://localhost:%s%n", port));
             while (!Thread.currentThread().isInterrupted()) {
                 selector.selectNow();
                 Set<SelectionKey> keys = selector.selectedKeys();
