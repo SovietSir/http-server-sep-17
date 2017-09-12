@@ -20,6 +20,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql STABLE;
 
+CREATE OR REPLACE FUNCTION select_offers_by_event_id(offer_event_id BIGINT)
+  RETURNS SETOF OFFER AS $$
+BEGIN
+  RETURN QUERY SELECT
+                 id,
+                 event_id,
+                 description,
+                 coefficient,
+                 result
+               FROM offer
+               WHERE event_id = offer_event_id
+               ORDER BY id;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
 CREATE OR REPLACE FUNCTION select_offer_by_id(offer_id BIGINT)
   RETURNS SETOF OFFER AS $$
 BEGIN
