@@ -1,7 +1,6 @@
 package com.epam.dao;
 
 import com.epam.daoInterfaces.OfferDAO;
-import com.epam.model.Event;
 import com.epam.model.Offer;
 import com.epam.store.ConnectionPool;
 import lombok.SneakyThrows;
@@ -10,7 +9,6 @@ import lombok.val;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
