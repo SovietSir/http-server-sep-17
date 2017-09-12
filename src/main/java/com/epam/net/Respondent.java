@@ -41,17 +41,17 @@ class Respondent {
         try {
             method = HttpMethod.valueOf(methodAndPath[0]);
         } catch (IllegalArgumentException e) {
-            return createResponse(HttpCodes.NOT_IMPLEMENTED);
+            return createResponse(HttpCodes.NOT_IMPLEMENTED.toString());
         }
 
         String path = methodAndPath[1];
         if (path.equals("/")) {
-            return createResponse(HttpCodes.OK, "{\"content\": \"start page\"}");
+            return createResponse(HttpCodes.OK.toString(), "{\"content\": \"start page\"}");
         }
         List<Tuple2<String, Long>> tuples = parse(path);
         if (tuples == null) {
             //syntax error
-            return createResponse(HttpCodes.BAD_REQUEST);
+            return createResponse(HttpCodes.BAD_REQUEST.toString());
         }
 
         contentAndTail = contentAndTail[1].split("\r\n\r\n");
@@ -72,7 +72,7 @@ class Respondent {
             case DELETE:
                 return respondOnDELETE(tuples);
             default:
-                return createResponse(HttpCodes.NOT_IMPLEMENTED);
+                return createResponse(HttpCodes.NOT_IMPLEMENTED.toString());
         }
     }
 
@@ -144,16 +144,16 @@ class Respondent {
                                     null));
             }
         } catch (NoSuchElementException e) {
-            return createResponse(HttpCodes.NOT_FOUND);
+            return createResponse(HttpCodes.NOT_FOUND.toString());
         } catch (NullPointerException ignored) {
         }
-        return createResponse(HttpCodes.BAD_REQUEST);
+        return createResponse(HttpCodes.BAD_REQUEST.toString());
     }
 
     //TODO: handle exceptions (incorrect json syntax or logic)
     private String respondOnPOST(List<Tuple2<String, Long>> tuples, String body) {
         if (!(tuples.size() == 1 && tuples.get(0)._2 != null)) {
-            return createResponse(HttpCodes.BAD_REQUEST);
+            return createResponse(HttpCodes.BAD_REQUEST.toString());
         }
         Tuple2<String, Long> tuple = tuples.get(0);
         switch (tuple._1) {
@@ -173,15 +173,15 @@ class Respondent {
                 betDAO.update(tuple._2, gson.fromJson(body, Bet.class));
                 break;
             default:
-                return createResponse(HttpCodes.BAD_REQUEST);
+                return createResponse(HttpCodes.BAD_REQUEST.toString());
         }
-        return createResponse(HttpCodes.OK);
+        return createResponse(HttpCodes.OK.toString());
     }
 
     //TODO: handle exceptions (incorrect json syntax or logic)
     private String respondOnPUT(List<Tuple2<String, Long>> tuples, String body) {
         if (!(tuples.size() == 1 && tuples.get(0)._2 == null)) {
-            return createResponse(HttpCodes.BAD_REQUEST);
+            return createResponse(HttpCodes.BAD_REQUEST.toString());
         }
         switch (tuples.get(0)._1) {
             case "leagues":
@@ -200,14 +200,14 @@ class Respondent {
                 betDAO.create(gson.fromJson(body, Bet.class));
                 break;
             default:
-                return createResponse(HttpCodes.BAD_REQUEST);
+                return createResponse(HttpCodes.BAD_REQUEST.toString());
         }
-        return createResponse(HttpCodes.OK);
+        return createResponse(HttpCodes.OK.toString());
     }
 
     private String respondOnDELETE(List<Tuple2<String, Long>> tuples) {
         if (!(tuples.size() == 1 && tuples.get(0)._2 != null)) {
-            return createResponse(HttpCodes.BAD_REQUEST);
+            return createResponse(HttpCodes.BAD_REQUEST.toString());
         }
         Tuple2<String, Long> tuple = tuples.get(0);
         switch (tuple._1) {
@@ -227,9 +227,9 @@ class Respondent {
                 betDAO.deleteById(tuple._2);
                 break;
             default:
-                return createResponse(HttpCodes.BAD_REQUEST);
+                return createResponse(HttpCodes.BAD_REQUEST.toString());
         }
-        return createResponse(HttpCodes.OK);
+        return createResponse(HttpCodes.OK.toString());
     }
 
     /**
@@ -274,6 +274,6 @@ class Respondent {
     }
 
     private String createResponseOK(String JSON) {
-        return createResponse(HttpCodes.OK, JSON);
+        return createResponse(HttpCodes.OK.toString(), JSON);
     }
 }
