@@ -50,15 +50,13 @@ public class Server {
     }
 
     private void startQueueExecutors() {
-        Thread t = new Thread(() -> {
+        Executors.newSingleThreadExecutor().execute(() -> {
             ExecutorService pool = Executors.newCachedThreadPool();
             while (!Thread.currentThread().isInterrupted()) {
                 SelectionKey key = queue.getKeyToExecute();
                 pool.execute(() -> execute(key));
             }
         });
-        t.setDaemon(true);
-        t.start();
     }
 
     private void execute(SelectionKey key) {
