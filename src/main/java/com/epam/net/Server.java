@@ -103,18 +103,26 @@ public class Server {
         log.debug(() -> String.format("Received %d bytes", bytes));
     }
 
-   @SneakyThrows
     private void write(SelectionKey key) {
-        try (val socketChannel = (SocketChannel) key.channel()) {
-            val buffer = (ByteBuffer) key.attachment();
-            val requestBytes = new byte[buffer.limit()];
-            buffer.get(requestBytes, 0, buffer.limit());
-            val request = new String(requestBytes);
-            log.debug(() -> String.format("Request:%n%s", request));
-            buffer.clear();
+        val buffer = (ByteBuffer) key.attachment();
+        String request = getRequest(buffer);
+        log.debug(() -> String.format("Request:%n%s", request));
+        String response = respondent.getResponse(request);
+        log.debug(() -> String.format("Response:%n%s", response));
+        writeResponse(response, buffer, key);
+    }
 
-            String response = respondent.getResponse(request).toString();
-            log.debug(() -> String.format("Response:%n%s", response));
+    private String getRequest(ByteBuffer buffer) {
+        val requestBytes = new byte[buffer.limit()];
+        buffer.get(requestBytes, 0, buffer.limit());
+        val request = new String(requestBytes);
+        buffer.clear();
+        return request;
+    }
+
+    @SneakyThrows
+    private void writeResponse(String response, ByteBuffer buffer, SelectionKey key) {
+        try (val socketChannel = (SocketChannel) key.channel()) {
             byte[] responseBytes = response.getBytes();
             for (int i = 0; i < responseBytes.length; i += bufferCapacity) {
                 int limit = i + bufferCapacity;
