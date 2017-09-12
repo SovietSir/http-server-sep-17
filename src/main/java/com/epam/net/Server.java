@@ -17,21 +17,21 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@SuppressWarnings("WeakerAccess")
 @Log4j2
-public class Server {
+public class Server implements Runnable {
     private final int port;
     private final int bufferCapacity;
     private final Respondent respondent = new Respondent();
     private final NoDuplicatingBlockingQueue queue = new NoDuplicatingBlockingQueue();
 
+    @SuppressWarnings("WeakerAccess")
     public Server(int port, int bufferCapacity) {
         this.port = port;
         this.bufferCapacity = bufferCapacity;
     }
 
     @SneakyThrows
-    public void start() {
+    public void run() {
         log.info("Server loading...");
         startQueueExecutors();
         try (ServerSocketChannel serverSocketChannel = openAndBindChannel(port);
@@ -136,6 +136,6 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        new Server(1024, 1024).start();
+        new Server(1024, 1024).run();
     }
 }
