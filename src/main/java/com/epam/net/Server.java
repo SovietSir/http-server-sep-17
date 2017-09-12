@@ -115,9 +115,8 @@ public class Server implements Runnable {
     private String getRequest(ByteBuffer buffer) {
         val requestBytes = new byte[buffer.limit()];
         buffer.get(requestBytes, 0, buffer.limit());
-        val request = new String(requestBytes);
         buffer.clear();
-        return request;
+        return new String(requestBytes);
     }
 
     @SneakyThrows
