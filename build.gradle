@@ -1,7 +1,9 @@
 group 'com.epam.http-server-sep-17'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'java'
+apply plugin: "java"
+
+apply plugin: "jacoco"
 
 sourceCompatibility = 1.8
 
@@ -20,6 +22,18 @@ dependencies {
 
     testCompile 'org.junit.jupiter:junit-jupiter-api:+',
             'org.testng:testng:+'
+}
+
+jacoco {
+    toolVersion = "+"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
 }
 
 test {

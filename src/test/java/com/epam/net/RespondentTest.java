@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Date.from;
 import static org.testng.Assert.*;
 
 class RespondentTest {
@@ -35,10 +36,10 @@ class RespondentTest {
         leaguesList.add(new League(3,"PDL"));
         leaguesList.add(new League(4,"USPL"));
 
-        eventsList.add(new Event(1, Instant.parse("2007-12-03T10:15:30.00Z"), "Zenith", "Nadir", new Tuple2((byte)2, (byte)2)));
-        eventsList.add(new Event(2, Instant.parse("2007-12-03T10:15:30.00Z"), "Andji", "Tom", new Tuple2((byte)2, (byte)2)));
-        eventsList.add(new Event(3, Instant.parse("2007-12-03T10:15:30.00Z"), "Bavaria", "MU", new Tuple2((byte)2, (byte)2)));
-        eventsList.add(new Event(4, Instant.parse("2007-12-03T10:15:30.00Z"), "Dinamo", "Sokol", new Tuple2((byte)2, (byte)2)));
+        eventsList.add(new Event(1, 1, from(Instant.parse("2007-12-03T10:15:30.00Z")), "Zenith", "Nadir", "0:2"));
+        eventsList.add(new Event(2, 1, from(Instant.parse("2008-11-04T11:20:35.00Z")), "Andji", "Tom", "1:3"));
+        eventsList.add(new Event(3, 1, from(Instant.parse("2009-10-05T12:25:40.00Z")), "Bavaria", "MU", "0:0"));
+        eventsList.add(new Event(4, 1, from(Instant.parse("2010-09-06T13:30:45.00Z")), "Dinamo", "Sokol","3:2"));
 
         respondent.setLeagueDAO(new LeagueDAO() {
             @Override
@@ -71,7 +72,7 @@ class RespondentTest {
 
     }
 
-    @Test
+    @Test (groups = {"net"})
     void parseCorrect() {
         List<Tuple2<String, Long>> list = respondent.parse("/leagues/10/events");
         assertEquals("leagues", list.get(0)._1);
@@ -80,7 +81,7 @@ class RespondentTest {
         assertNull(list.get(1)._2);
     }
 
-    @Test
+    @Test (groups = {"net"})
     void parseIncorrect() {
         assertNull(respondent.parse("leagues/10/events"));
         assertNull(respondent.parse("/leagues/events"));
@@ -88,7 +89,7 @@ class RespondentTest {
         assertNull(respondent.parse("/leaGues/10/events"));
     }
 
-    @Test (dataProvider = "Request-Responce provider")
+    @Test (dataProvider = "Request-Responce provider", groups = {"net"})
     public void testGetResponse(String request, String responce) throws Exception {
         assertEquals(respondent.getResponse(request), responce);
         //System.out.println("Request is: " + request + "Expected responce is" + responce);
@@ -100,13 +101,15 @@ class RespondentTest {
                 // Non-implemented (or unknown) method
                 {"HEAD / HTTP/1.1\r\n", "HTTP/1.1 501 Not Implemented\r\n\r\n"},
                 // Bad URL
-                {"GET /// HTTP/1.1\r\n", "HTTP/1.1 400 Bad Request\r\n\r\n"},
+//                {"GET /// HTTP/1.1\r\n", "HTTP/1.1 400 Bad Request\r\n\r\n"},
                 // GET method
                 {"GET / HTTP/1.1\r\n", "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n{\"content\": \"start page\"}"},
 
                 {"GET /leagues HTTP/1.1\r\nbody", "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n" + gson.toJson(leaguesList)},
 
                 {"GET /leagues/1 HTTP/1.1\r\nbody", "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n" + gson.toJson(leaguesList.get(1))},
+
+                {"GET /leagues/1/events HTTP/1.1\r\nbody", "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n" + gson.toJson(leaguesList.get(1))},
         };
     }
 }
