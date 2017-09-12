@@ -75,16 +75,13 @@ public class Server {
                 .configureBlocking(false);
     }
 
+    @SneakyThrows
     private void accept(SelectionKey key) {
-        try {
             SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
             socketChannel.configureBlocking(false);
             SelectionKey newKey = socketChannel.register(key.selector(), SelectionKey.OP_READ);
             newKey.attach(ByteBuffer.allocateDirect(bufferCapacity));
             log.info(() -> String.format("Accepted {%s}", socketChannel));
-        } catch (IOException e) {
-            log.error("Error while accepting", e);
-        }
     }
 
     @SneakyThrows
