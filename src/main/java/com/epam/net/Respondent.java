@@ -3,12 +3,16 @@ package com.epam.net;
 import com.epam.dao.*;
 import com.epam.daoInterfaces.*;
 import com.epam.model.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import io.vavr.Tuple2;
 import lombok.Setter;
 import lombok.val;
 
+import java.lang.reflect.Type;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -25,7 +29,10 @@ class Respondent {
     }
 
     private final Gson gson = new GsonBuilder()
-            .setDateFormat("dd-MM-yyyy HH:mm")
+            .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, type, jsonDeserializationContext) -> {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+                return LocalDateTime.parse(json.getAsString(), formatter);
+            })
             .create();
     private LeagueDAO leagueDAO = new LeagueDAOImpl();
     private EventDAO eventDAO = new EventDAOImpl();
