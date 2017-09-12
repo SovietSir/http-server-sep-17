@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Bet {
     private long id;
-    private long offerId;
     private long personId;
+    private long offerId;
     private long amount;
     private float gain;
 }
