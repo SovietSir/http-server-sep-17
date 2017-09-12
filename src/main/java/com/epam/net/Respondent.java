@@ -33,7 +33,7 @@ class Respondent {
     private PersonDAO personDAO = new PersonDAOImpl();
     private BetDAO betDAO = new BetDAOImpl();
 
-    String getResponse(String request) {
+    HttpResponse getResponse(String request) {
         String[] contentAndTail = request.split("\r\n", 2);
         String[] methodAndPath = contentAndTail[0].split(" ");
 
@@ -41,17 +41,17 @@ class Respondent {
         try {
             method = HttpMethod.valueOf(methodAndPath[0]);
         } catch (IllegalArgumentException e) {
-            return createResponse(HttpCodes.NOT_IMPLEMENTED.toString());
+            return new HttpResponse(HttpCodes.NOT_IMPLEMENTED);
         }
 
         String path = methodAndPath[1];
         if (path.equals("/")) {
-            return createResponse(HttpCodes.OK.toString(), "{\"content\": \"start page\"}");
+            return createJSONResponseOK("{\"content\": \"start page\"}");
         }
         List<Tuple2<String, Long>> tuples = parse(path);
         if (tuples == null) {
             //syntax error
-            return createResponse(HttpCodes.BAD_REQUEST.toString());
+            return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
 
         contentAndTail = contentAndTail[1].split("\r\n\r\n");
@@ -60,7 +60,7 @@ class Respondent {
         return getResponseFromCorrectInput(method, tuples, body);
     }
 
-    private String getResponseFromCorrectInput
+    private HttpResponse getResponseFromCorrectInput
             (HttpMethod method, List<Tuple2<String, Long>> tuples, String body) {
         switch (method) {
             case GET:
@@ -72,7 +72,7 @@ class Respondent {
             case DELETE:
                 return respondOnDELETE(tuples);
             default:
-                return createResponse(HttpCodes.NOT_IMPLEMENTED.toString());
+                return new HttpResponse(HttpCodes.NOT_IMPLEMENTED);
         }
     }
 
@@ -109,51 +109,51 @@ class Respondent {
         }
     }
 
-    private String respondOnGET(List<Tuple2<String, Long>> tuples) {
+    private HttpResponse respondOnGET(List<Tuple2<String, Long>> tuples) {
         try {
             switch (tuples.get(0)._1) {
                 case "leagues":
-                    return createResponseOK(
+                    return createJSONResponseOK(
                             touchDAO(tuples,
                                     leagueDAO::readAll,
                                     leagueDAO::readById,
                                     eventDAO::readEventsByLeagueId));
                 case "events":
-                    return createResponseOK(
+                    return createJSONResponseOK(
                             touchDAO(tuples,
                                     eventDAO::readAll,
                                     eventDAO::readById,
                                     offerDAO::readOffersByEventId));
                 case "offers":
-                    return createResponseOK(
+                    return createJSONResponseOK(
                             touchDAO(tuples,
                                     null,
                                     offerDAO::readById,
                                     betDAO::readBetsByOfferId));
                 case "persons":
-                    return createResponseOK(
+                    return createJSONResponseOK(
                             touchDAO(tuples,
                                     personDAO::readAll,
                                     personDAO::readById,
                                     betDAO::readBetsByPersonId));
                 case "bets":
-                    return createResponseOK(
+                    return createJSONResponseOK(
                             touchDAO(tuples,
                                     null,
                                     betDAO::readById,
                                     null));
             }
         } catch (NoSuchElementException e) {
-            return createResponse(HttpCodes.NOT_FOUND.toString());
+            return new HttpResponse(HttpCodes.NOT_FOUND);
         } catch (NullPointerException ignored) {
         }
-        return createResponse(HttpCodes.BAD_REQUEST.toString());
+        return new HttpResponse(HttpCodes.BAD_REQUEST);
     }
 
     //TODO: handle exceptions (incorrect json syntax or logic)
-    private String respondOnPOST(List<Tuple2<String, Long>> tuples, String body) {
+    private HttpResponse respondOnPOST(List<Tuple2<String, Long>> tuples, String body) {
         if (!(tuples.size() == 1 && tuples.get(0)._2 != null)) {
-            return createResponse(HttpCodes.BAD_REQUEST.toString());
+            return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
         Tuple2<String, Long> tuple = tuples.get(0);
         switch (tuple._1) {
@@ -173,15 +173,15 @@ class Respondent {
                 betDAO.update(tuple._2, gson.fromJson(body, Bet.class));
                 break;
             default:
-                return createResponse(HttpCodes.BAD_REQUEST.toString());
+                return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
-        return createResponse(HttpCodes.OK.toString());
+        return new HttpResponse(HttpCodes.OK);
     }
 
     //TODO: handle exceptions (incorrect json syntax or logic)
-    private String respondOnPUT(List<Tuple2<String, Long>> tuples, String body) {
+    private HttpResponse respondOnPUT(List<Tuple2<String, Long>> tuples, String body) {
         if (!(tuples.size() == 1 && tuples.get(0)._2 == null)) {
-            return createResponse(HttpCodes.BAD_REQUEST.toString());
+            return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
         switch (tuples.get(0)._1) {
             case "leagues":
@@ -200,14 +200,14 @@ class Respondent {
                 betDAO.create(gson.fromJson(body, Bet.class));
                 break;
             default:
-                return createResponse(HttpCodes.BAD_REQUEST.toString());
+                return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
-        return createResponse(HttpCodes.OK.toString());
+        return new HttpResponse(HttpCodes.OK);
     }
 
-    private String respondOnDELETE(List<Tuple2<String, Long>> tuples) {
+    private HttpResponse respondOnDELETE(List<Tuple2<String, Long>> tuples) {
         if (!(tuples.size() == 1 && tuples.get(0)._2 != null)) {
-            return createResponse(HttpCodes.BAD_REQUEST.toString());
+            return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
         Tuple2<String, Long> tuple = tuples.get(0);
         switch (tuple._1) {
@@ -227,9 +227,9 @@ class Respondent {
                 betDAO.deleteById(tuple._2);
                 break;
             default:
-                return createResponse(HttpCodes.BAD_REQUEST.toString());
+                return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
-        return createResponse(HttpCodes.OK.toString());
+        return new HttpResponse(HttpCodes.OK);
     }
 
     /**
@@ -263,17 +263,9 @@ class Respondent {
         return json;
     }
 
-    private String createResponse(String code) {
-        return String.format("HTTP/1.1 %s\r\n\r\n", code);
-    }
-
-    private String createResponse(String code, String JSON) {
-        return String.format(
-                "HTTP/1.1 %s\r\nContent-Type: application/json\r\n\r\n%s",
-                code, JSON);
-    }
-
-    private String createResponseOK(String JSON) {
-        return createResponse(HttpCodes.OK.toString(), JSON);
+    private HttpResponse createJSONResponseOK(String JSON) {
+        val headers = new HashMap<String, String>();
+        headers.put("Content-Type", "application/json");
+        return new HttpResponse(HttpCodes.OK, headers, JSON);
     }
 }

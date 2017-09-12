@@ -93,7 +93,7 @@ public class Server {
             log.debug(() -> String.format("Request:%n%s", request));
             buffer.clear();
 
-            String response = respondent.getResponse(request);
+            String response = respondent.getResponse(request).toString();
             log.debug(() -> String.format("Response:%n%s", response));
             byte[] responseBytes = response.getBytes();
             for (int i = 0; i < responseBytes.length; i += bufferCapacity) {
