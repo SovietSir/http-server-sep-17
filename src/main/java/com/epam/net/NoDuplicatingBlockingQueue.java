@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
-// TODO проверить на корректную работу в случае большого числа потоков
-// в частности, не будет ли ошибок из за отсутствия принудительной синхронизизации большей части методов
 class NoDuplicatingBlockingQueue {
     private final ArrayBlockingQueue<SelectionKey> socketQueue = new ArrayBlockingQueue<>(100);
     private final Set<SelectionKey> keysInWork = Collections.synchronizedSet(new HashSet<>());
