@@ -14,6 +14,8 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @SuppressWarnings("WeakerAccess")
 @Log4j2
@@ -49,9 +51,10 @@ public class Server {
 
     private void startQueueExecutors() {
         Thread t = new Thread(() -> {
+            ExecutorService pool = Executors.newCachedThreadPool();
             while (!Thread.currentThread().isInterrupted()) {
                 SelectionKey key = queue.getKeyToExecute();
-                execute(key);
+                pool.execute(() -> execute(key));
             }
         });
         t.setDaemon(true);
