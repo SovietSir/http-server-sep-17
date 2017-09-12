@@ -103,10 +103,8 @@ public class Server {
         log.debug(() -> String.format("Received %d bytes", bytes));
     }
 
-    //TODO: рассмотреть ситуацию Connection: keep-alive (не закрывать канал каждый раз)
-    @SneakyThrows
+   @SneakyThrows
     private void write(SelectionKey key) {
-        //channel closes here
         try (val socketChannel = (SocketChannel) key.channel()) {
             val buffer = (ByteBuffer) key.attachment();
             val requestBytes = new byte[buffer.limit()];
@@ -126,7 +124,7 @@ public class Server {
                 socketChannel.write(buffer);
                 buffer.clear();
             }
-        }
+        } //channel closes here
     }
 
     public static void main(String[] args) {
