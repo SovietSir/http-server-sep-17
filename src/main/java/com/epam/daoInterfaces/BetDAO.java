@@ -7,5 +7,5 @@ import java.util.List;
 public interface BetDAO extends DAOCrud<Bet, Long> {
     List<Bet> readBetsByOfferId(long offerId);
 
-    List<Bet> readBetsByUserId(long userId);
+    List<Bet> readBetsByPersonId(long personId);
 }
