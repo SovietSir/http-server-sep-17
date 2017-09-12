@@ -42,7 +42,7 @@ public class Server {
                 Set<SelectionKey> keys = selector.selectedKeys();
                 keys.stream()
                         .filter(SelectionKey::isValid)
-                        .filter(key -> !queue.contains(key))
+                        .filter(queue::notContains)
                         .forEach(queue::add);
                 keys.clear();
             }

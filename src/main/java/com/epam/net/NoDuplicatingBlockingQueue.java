@@ -32,7 +32,11 @@ class NoDuplicatingBlockingQueue {
         return socketQueue.take();
     }
 
-    boolean contains(SelectionKey key) {
+    boolean notContains(SelectionKey key) {
+        return !contains(key);
+    }
+
+    private boolean contains(SelectionKey key) {
         return socketQueue.contains(key) || keysInWork.contains(key);
     }
 
