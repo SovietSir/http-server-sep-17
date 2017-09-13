@@ -34,7 +34,7 @@ public class EventDAOImpl implements EventDAO {
             while (resultSet.next()) {
                 list.add(new Event(resultSet.getLong("id"),
                         resultSet.getLong("league_id"),
-                        resultSet.getTimestamp("date"),
+                        resultSet.getTimestamp("date").toLocalDateTime(),
                         resultSet.getString("home_team"),
                         resultSet.getString("guest_team"),
                         resultSet.getString("score")
@@ -55,7 +55,7 @@ public class EventDAOImpl implements EventDAO {
             while (resultSet.next()) {
                 list.add(new Event(resultSet.getLong("id"),
                         resultSet.getLong("league_id"),
-                        resultSet.getTimestamp("date"),
+                        resultSet.getTimestamp("date").toLocalDateTime(),
                         resultSet.getString("home_team"),
                         resultSet.getString("guest_team"),
                         resultSet.getString("score")
@@ -71,7 +71,7 @@ public class EventDAOImpl implements EventDAO {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT)) {
             preparedStatement.setLong(1, event.getLeagueId());
-            preparedStatement.setTimestamp(2, new Timestamp(event.getDate().getTime()));
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(event.getDate()));
             preparedStatement.setString(3, event.getHomeTeam());
             preparedStatement.setString(4, event.getGuestTeam());
             preparedStatement.setString(5, event.getScore());
@@ -89,7 +89,7 @@ public class EventDAOImpl implements EventDAO {
                 if (resultSet.next()) {
                     new Event(resultSet.getLong("id"),
                             resultSet.getLong("league_id"),
-                            resultSet.getTimestamp("date"),
+                            resultSet.getTimestamp("date").toLocalDateTime(),
                             resultSet.getString("home_team"),
                             resultSet.getString("guest_team"),
                             resultSet.getString("score"));
@@ -106,7 +106,7 @@ public class EventDAOImpl implements EventDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE)) {
             preparedStatement.setLong(1, id);
             preparedStatement.setLong(2, event.getLeagueId());
-            preparedStatement.setTimestamp(3, new Timestamp(event.getDate().getTime()));
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(event.getDate()));
             preparedStatement.setString(4, event.getHomeTeam());
             preparedStatement.setString(5, event.getGuestTeam());
             preparedStatement.setString(6, event.getScore());
