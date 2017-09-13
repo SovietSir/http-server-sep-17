@@ -3,7 +3,6 @@
 .classpath
 .metadata/
 .project
-*.properties
 !sonar-project.properties
 .gradle/
 .settings
