@@ -50,11 +50,12 @@ public class EventDAOImplTest {
     public void testCreate() throws Exception {
         eventList.add(new Event(5, 5, from(Instant.parse("2010-09-06T13:30:45.00Z")), "Dinamo", "Sokol", "3:2"));
         eventDAO.create(eventList.get(4));
-        assertEquals(eventDAO.readById((long)5),eventList.get(4));
+        assertEquals(eventDAO.readById((long)5), eventList.get(4));
     }
 
     @Test
     public void testReadById() throws Exception {
+        assertEquals(eventDAO.readById((long)1), eventList.get(0));
     }
 
     @Test
