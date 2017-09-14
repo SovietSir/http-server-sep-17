@@ -1,4 +1,4 @@
-package com.epam.daoInterfaces;
+package com.epam.dao;
 
 interface DAOCrud<Value, Id> {
     void create(Value value);

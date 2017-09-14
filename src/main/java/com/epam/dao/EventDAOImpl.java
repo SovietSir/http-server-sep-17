@@ -1,6 +1,5 @@
 package com.epam.dao;
 
-import com.epam.daoInterfaces.EventDAO;
 import com.epam.model.Event;
 import com.epam.store.ConnectionPool;
 import lombok.SneakyThrows;

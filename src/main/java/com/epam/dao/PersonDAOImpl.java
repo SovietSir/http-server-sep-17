@@ -1,6 +1,5 @@
 package com.epam.dao;
 
-import com.epam.daoInterfaces.PersonDAO;
 import com.epam.model.Person;
 import com.epam.store.ConnectionPool;
 import lombok.SneakyThrows;

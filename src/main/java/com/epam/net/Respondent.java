@@ -1,7 +1,6 @@
 package com.epam.net;
 
 import com.epam.dao.*;
-import com.epam.daoInterfaces.*;
 import com.epam.model.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

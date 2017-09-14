@@ -1,4 +1,4 @@
-package com.epam.daoInterfaces;
+package com.epam.dao;
 
 import com.epam.model.Person;
 

@@ -1,6 +1,5 @@
 package com.epam.dao;
 
-import com.epam.daoInterfaces.OfferDAO;
 import com.epam.model.Offer;
 import com.epam.store.ConnectionPool;
 import lombok.SneakyThrows;
