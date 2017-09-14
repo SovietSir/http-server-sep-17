@@ -46,15 +46,20 @@ public class PersonDAOImplTest {
 
     @Test
     public void testReadById() throws Exception {
-
+        assertEquals(personDAO.readById((long)2),personList.get(1));
     }
 
     @Test
     public void testUpdate() throws Exception {
+         personList.set(1,new Person(2,"User2_1",2221,2221));
+         personDAO.update((long)2,personList.get(1));
+         assertEquals(personDAO.readById((long)2),personList.get(1));
     }
 
     @Test
     public void testDeleteById() throws Exception {
+         personDAO.deleteById((long)4);
+         personList.remove(3);
+         assertEquals(personDAO.readAll(),personList);
     }
-
 }
