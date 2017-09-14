@@ -2,6 +2,7 @@ package com.epam.dao;
 
 import com.epam.model.Event;
 import com.epam.store.ConnectionPool;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.time.Instant;
@@ -16,6 +17,7 @@ public class EventDAOImplTest {
     private EventDAOImpl eventDAO;
     private ArrayList<Event> eventList;
 
+    @BeforeClass
     void setup(){
         eventDAO = new EventDAOImpl();
         eventList = new ArrayList<>();
@@ -46,6 +48,9 @@ public class EventDAOImplTest {
 
     @Test
     public void testCreate() throws Exception {
+        eventList.add(new Event(5, 5, from(Instant.parse("2010-09-06T13:30:45.00Z")), "Dinamo", "Sokol", "3:2"));
+        eventDAO.create(eventList.get(4));
+        assertEquals(eventDAO.readById((long)5),eventList.get(4));
     }
 
     @Test
