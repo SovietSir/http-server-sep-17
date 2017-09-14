@@ -1,0 +1,75 @@
+digraph meeting_rooms_db {
+  node [shape=rectangle]
+
+  rankdir=LR
+
+  league
+  [
+    shape = none
+    label = <<table border="0" cellspacing="0">
+                <tr><td border="1" bgcolor="grey"><b>league</b></td></tr>
+                <tr><td port="id" border="1">id</td></tr>
+                <tr><td border="1">name</td></tr>
+            </table>>
+  ]
+
+  event
+  [
+    shape = none
+    label = <<table border="0" cellspacing="0">
+                <tr><td border="1" bgcolor="grey">  <b>event</b>  </td></tr>
+                <tr><td port="id" border="1">id</td></tr>
+                <tr><td port="l_id" border="1">league_id</td></tr>
+                <tr><td border="1">date</td></tr>
+                <tr><td border="1">home_team</td></tr>
+                <tr><td border="1">guest_team</td></tr>
+                <tr><td border="1">score</td></tr>
+            </table>>
+  ]
+
+  event:l_id -> league:id [weight=0]
+
+  offer
+  [
+    shape = none
+    label = <<table border="0" cellspacing="0">
+                <tr><td border="1" bgcolor="grey">  <b>offer</b>  </td></tr>
+                <tr><td port="id" border="1">id</td></tr>
+                <tr><td port="e_id" border="1">event_id</td></tr>
+                <tr><td border="1">description</td></tr>
+                <tr><td border="1">coefficient</td></tr>
+                <tr><td border="1">result</td></tr>
+            </table>>
+  ]
+
+  offer:e_id -> event:id [weight=0]
+
+  user
+  [
+    shape = none
+    label = <<table border="0" cellspacing="0">
+                <tr><td border="1" bgcolor="grey">  <b>user</b>  </td></tr>
+                <tr><td port="id" border="1">id</td></tr>
+                <tr><td border="1">login</td></tr>
+                <tr><td border="1">password_hash</td></tr>
+                <tr><td border="1">balance</td></tr>
+            </table>>
+  ]
+
+  bet
+  [
+    shape = none
+    label = <<table border="0" cellspacing="0">
+                <tr><td border="1" bgcolor="grey">  <b>bet</b>  </td></tr>
+                <tr><td port="id" border="1">id</td></tr>
+                <tr><td port="u_id" border="1">user_id</td></tr>
+                <tr><td port="o_id" border="1">offer_id</td></tr>
+                <tr><td border="1">amount</td></tr>
+                <tr><td border="1">gain</td></tr>
+            </table>>
+  ]
+
+  bet:u_id -> user:id [weight=0]
+  bet:o_id -> offer:id [weight=0]
+
+}

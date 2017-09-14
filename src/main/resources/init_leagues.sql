@@ -27,9 +27,9 @@ END;
 $$ LANGUAGE plpgsql STABLE;
 
 CREATE OR REPLACE FUNCTION insert_league(league_name VARCHAR(100))
-  RETURNS VOID AS $$
+  RETURNS SETOF LEAGUE AS $$
 BEGIN
-  INSERT INTO league (name) VALUES (league_name);
+  RETURN QUERY INSERT INTO league (name) VALUES (league_name) RETURNING *;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
@@ -42,10 +42,11 @@ END;
 $$ LANGUAGE plpgsql VOLATILE;
 
 CREATE OR REPLACE FUNCTION update_league(league_id BIGINT, league_name VARCHAR(100))
-  RETURNS VOID AS $$
+  RETURNS SETOF LEAGUE AS $$
 BEGIN
-  UPDATE league
+  RETURN QUERY UPDATE league
   SET name = league_name
-  WHERE id = league_id;
+  WHERE id = league_id
+  RETURNING *;
 END;
 $$ LANGUAGE plpgsql VOLATILE;

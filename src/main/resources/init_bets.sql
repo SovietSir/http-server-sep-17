@@ -66,10 +66,12 @@ END;
 $$ LANGUAGE plpgsql STABLE;
 
 CREATE OR REPLACE FUNCTION insert_bet(bet_person_id BIGINT, bet_offer_id BIGINT, bet_amount BIGINT, bet_gain FLOAT)
-  RETURNS VOID AS $$
+  RETURNS SETOF BET AS $$
 BEGIN
+  RETURN QUERY
   INSERT INTO bet (person_id, offer_id, amount, gain)
-  VALUES (bet_person_id, bet_offer_id, bet_amount, bet_gain);
+  VALUES (bet_person_id, bet_offer_id, bet_amount, bet_gain)
+  RETURNING *;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
@@ -83,10 +85,12 @@ $$ LANGUAGE plpgsql VOLATILE;
 
 CREATE OR REPLACE FUNCTION update_bet(bet_id   BIGINT, bet_person_id BIGINT, bet_offer_id BIGINT, bet_amount BIGINT,
                                       bet_gain FLOAT)
-  RETURNS VOID AS $$
+  RETURNS SETOF BET AS $$
 BEGIN
+  RETURN QUERY
   UPDATE bet
   SET person_id = bet_person_id, offer_id = bet_offer_id, amount = bet_amount, gain = bet_gain
-  WHERE id = bet_id;
+  WHERE id = bet_id
+  RETURNING *;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
