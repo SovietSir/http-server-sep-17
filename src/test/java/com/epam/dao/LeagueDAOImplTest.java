@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import static org.testng.AssertJUnit.assertEquals;
 
 public class LeagueDAOImplTest {
+
     private LeagueDAOImpl leagueDAO;
     private ArrayList<League> leaguesList;
 
@@ -43,4 +44,18 @@ public class LeagueDAOImplTest {
         assertEquals(leagueDAO.readById((long)4),leaguesList.get(3));
     }
 
+    @Test
+    public void testCreate() throws Exception {
+        leagueDAO.create(new League(5,"TEST LEAGUE"));
+        leaguesList.add(new League(5,"TEST LEAGUE"));
+        assertEquals(leagueDAO.readById((long)5),leaguesList.get(4));
+    }
+
+    @Test
+    public void testUpdate() throws Exception {
+    }
+
+    @Test
+    public void testDeleteById() throws Exception {
+    }
 }
