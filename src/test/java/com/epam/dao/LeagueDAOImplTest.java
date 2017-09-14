@@ -44,13 +44,13 @@ public class LeagueDAOImplTest {
     public void testReadAll() throws Exception {
        assertEquals(leagueDAO.readAll(),leaguesList);
     }
-//
-//    @Test
-//    public void testReadById() throws Exception {
-////        assertEquals(leagueDAO.readById((long)1),leaguesList.get(0));
-////        assertEquals(leagueDAO.readById((long)2),leaguesList.get(1));
-////        assertEquals(leagueDAO.readById((long)3),leaguesList.get(2));
-////        assertEquals(leagueDAO.readById((long)4),leaguesList.get(3));
-//    }
+
+    @Test
+    public void testReadById() throws Exception {
+        assertEquals(leagueDAO.readById((long)1),leaguesList.get(0));
+        assertEquals(leagueDAO.readById((long)2),leaguesList.get(1));
+        assertEquals(leagueDAO.readById((long)3),leaguesList.get(2));
+        assertEquals(leagueDAO.readById((long)4),leaguesList.get(3));
+    }
 
 }
