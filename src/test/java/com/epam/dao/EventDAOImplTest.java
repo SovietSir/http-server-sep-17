@@ -77,9 +77,11 @@ public class EventDAOImplTest {
         assertEquals(eventDAO.readById(1L),eventList.get(0));
     }
 
-//    @Test
-//    public void testDeleteById() throws Exception {
-//
-//    }
+    @Test
+    public void testDeleteById() throws Exception {
+        eventDAO.deleteById(4L);
+        eventList.remove(3);
+        assertEquals(eventDAO.readAll(),eventList);
+    }
 
 }
