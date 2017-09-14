@@ -1,22 +1,12 @@
 package com.epam.dao;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
-import static ru.yandex.qatools.embed.postgresql.distribution.Version.Main.V9_6;
-
 import com.epam.model.League;
 import com.epam.store.ConnectionPool;
-//import org.hamcrest.core.Is;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-//import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.testng.AssertJUnit.assertEquals;
 
 public class LeagueDAOImplTest {
     private LeagueDAOImpl leagueDAO;
