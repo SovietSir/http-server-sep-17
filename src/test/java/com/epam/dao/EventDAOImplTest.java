@@ -69,13 +69,13 @@ public class EventDAOImplTest {
         assertEquals(eventDAO.readById(5L), eventList.get(4));
     }
 
-//
-//    @Test
-//    public void testUpdate() throws Exception {
-//        eventList.set(0,new Event(1, 1, parse("2007-12-03T15:15:30"), "Dinamo111", "Sokol111", "3:2"));
-//        eventDAO.update(1L,eventList.get(0));
-//        assertEquals(eventDAO.readById(1L),eventList.get(0));
-//    }
+
+    @Test
+    public void testUpdate() throws Exception {
+        eventList.set(0,new Event(1, 1, parse("2007-12-03T15:15:30"), "Dinamo111", "Sokol111", "3:2"));
+        eventDAO.update(1L,eventList.get(0));
+        assertEquals(eventDAO.readById(1L),eventList.get(0));
+    }
 
 //    @Test
 //    public void testDeleteById() throws Exception {
