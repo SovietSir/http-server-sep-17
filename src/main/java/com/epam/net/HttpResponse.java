@@ -5,17 +5,26 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.val;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @EqualsAndHashCode
 @AllArgsConstructor
-class HttpResponse {
+public class HttpResponse {
     @NonNull private HttpCodes code;
     private Map<String, String> headers;
     private String body;
 
-    HttpResponse(HttpCodes code) {
+    public HttpResponse(HttpCodes code) {
         this(code, null, null);
+    }
+
+    public HttpResponse(String JSON) {
+        val headers = new HashMap<String, String>();
+        headers.put("Content-Type", "application/json");
+        this.code = HttpCodes.OK;
+        this.headers = headers;
+        this.body = JSON;
     }
 
     @Override

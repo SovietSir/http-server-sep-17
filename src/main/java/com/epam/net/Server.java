@@ -1,5 +1,6 @@
 package com.epam.net;
 
+import com.epam.store.ConnectionPool;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import lombok.val;
@@ -132,6 +133,8 @@ public class Server implements Runnable {
     }
 
     public static void main(String[] args) {
+        ConnectionPool.pool.dropDatabase();
+        ConnectionPool.pool.initDatabase();
         new Server(1024, 1024).run();
     }
 }
