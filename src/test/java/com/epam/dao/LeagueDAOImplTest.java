@@ -1,5 +1,6 @@
 package com.epam.dao;
 import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
 import static ru.yandex.qatools.embed.postgresql.distribution.Version.Main.V9_6;
 
 import com.epam.model.League;
@@ -41,7 +42,7 @@ public class LeagueDAOImplTest {
 
     @Test
     public void testReadAll() throws Exception {
-        assertEquals(leagueDAO.readAll(),leaguesList);
+       assertEquals(leagueDAO.readAll(),leaguesList);
     }
 //
 //    @Test
