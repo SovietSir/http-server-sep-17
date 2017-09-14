@@ -248,9 +248,9 @@ class Respondent {
      * @return generated JSON
      */
     private String touchDAO(List<Tuple2<String, Long>> tuples,
-                    Supplier<Object> levelOne,
-                    Function<Long, Object> levelTwo,
-                    Function<Long, Object> levelThree) {
+                                     Supplier<Object> levelOne,
+                                     Function<Long, Object> levelTwo,
+                                     Function<Long, Object> levelThree) {
         String json;
         Tuple2<String, Long> tuple = tuples.get(0);
         if (tuples.size() == 1) {

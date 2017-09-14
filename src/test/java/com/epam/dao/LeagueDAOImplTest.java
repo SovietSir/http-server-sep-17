@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import static org.testng.AssertJUnit.assertEquals;
 
+@Test(enabled = false)
 public class LeagueDAOImplTest {
 
     private LeagueDAOImpl leagueDAO;

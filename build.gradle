@@ -38,5 +38,6 @@ jacocoTestReport {
 
 test {
     useTestNG() {
+        include "**/*RespondentTest.class"
     }
 }
