@@ -75,9 +75,10 @@ public class OfferDAOImplTest {
         assertEquals(offerDAO.readById(4L),offerList.get(3));
     }
 
-//    @Test
-//    public void testReadById() throws Exception {
-//    }
+    @Test
+    public void testReadById() throws Exception {
+        assertEquals(offerDAO.readById(1L),offerList.get(0));
+    }
 //
 //    @Test
 //    public void testUpdate() throws Exception {
