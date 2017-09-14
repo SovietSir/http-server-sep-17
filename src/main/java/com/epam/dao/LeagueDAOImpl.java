@@ -50,7 +50,7 @@ public class LeagueDAOImpl implements LeagueDAO {
 
     @SneakyThrows
     @Override
-    public League readById(Long id) {
+    public League read(Long id) {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);

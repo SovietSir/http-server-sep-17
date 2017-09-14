@@ -81,7 +81,7 @@ public class EventDAOImpl implements EventDAO {
 
     @SneakyThrows
     @Override
-    public Event readById(Long id) {
+    public Event read(Long id) {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);

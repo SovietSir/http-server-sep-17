@@ -59,7 +59,7 @@ public class OfferDAOImpl implements OfferDAO {
 
     @SneakyThrows
     @Override
-    public Offer readById(Long id) {
+    public Offer read(Long id) {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);

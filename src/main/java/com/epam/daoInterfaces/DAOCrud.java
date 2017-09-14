@@ -3,7 +3,7 @@ package com.epam.daoInterfaces;
 interface DAOCrud<Value, Id> {
     void create(Value value);
 
-    Value readById(Id id);
+    Value read(Id id);
 
     void update(Id id, Value value);
 

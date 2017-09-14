@@ -54,7 +54,7 @@ public class PersonDAOImpl implements PersonDAO {
 
     @SneakyThrows
     @Override
-    public Person readById(Long id) {
+    public Person read(Long id) {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);

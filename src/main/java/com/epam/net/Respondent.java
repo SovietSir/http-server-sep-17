@@ -146,31 +146,31 @@ class Respondent {
                     return createJSONResponseOK(
                             touchDAO(tuples,
                                     leagueDAO::readAll,
-                                    leagueDAO::readById,
+                                    leagueDAO::read,
                                     eventDAO::readEventsByLeagueId));
                 case "events":
                     return createJSONResponseOK(
                             touchDAO(tuples,
                                     eventDAO::readAll,
-                                    eventDAO::readById,
+                                    eventDAO::read,
                                     offerDAO::readOffersByEventId));
                 case "offers":
                     return createJSONResponseOK(
                             touchDAO(tuples,
                                     null,
-                                    offerDAO::readById,
+                                    offerDAO::read,
                                     betDAO::readBetsByOfferId));
                 case "persons":
                     return createJSONResponseOK(
                             touchDAO(tuples,
                                     personDAO::readAll,
-                                    personDAO::readById,
+                                    personDAO::read,
                                     betDAO::readBetsByPersonId));
                 case "bets":
                     return createJSONResponseOK(
                             touchDAO(tuples,
                                     null,
-                                    betDAO::readById,
+                                    betDAO::read,
                                     null));
             }
         } catch (NoSuchElementException e) {
