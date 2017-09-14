@@ -43,9 +43,9 @@ public class EventDAOImplTest {
 
 
         eventList.add(new Event(1, 1,  parse("2007-12-03T15:15:30"), "Zenith", "Nadir", "0:2"));
-        eventList.add(new Event(2, 1,  parse("2007-12-03T15:15:30"), "Andji", "Tom", "1:3"));
-        eventList.add(new Event(3, 1,  parse("2007-12-03T15:15:30"), "Bavaria", "MU", "0:0"));
-        eventList.add(new Event(4, 1,  parse("2007-12-03T15:15:30"), "Dinamo", "Sokol", "3:2"));
+        eventList.add(new Event(2, 2,  parse("2007-12-03T15:15:30"), "Andji", "Tom", "1:3"));
+        eventList.add(new Event(3, 3,  parse("2007-12-03T15:15:30"), "Bavaria", "MU", "0:0"));
+        eventList.add(new Event(4, 4,  parse("2007-12-03T15:15:30"), "Dinamo", "Sokol", "3:2"));
 
         eventDAO.create(eventList.get(0));
         eventDAO.create(eventList.get(1));
@@ -58,9 +58,10 @@ public class EventDAOImplTest {
         assertEquals(eventDAO.readAll(),eventList);
     }
 
-//    @Test
-//    public void testReadEventsByLeagueId() throws Exception {
-//    }
+    @Test
+    public void testReadEventsByLeagueId() throws Exception {
+        assertEquals(eventDAO.readEventsByLeagueId(1L).get(0),eventList.get(0));
+    }
 
     @Test
     public void testCreate() throws Exception {
