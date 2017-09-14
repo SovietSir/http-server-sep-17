@@ -6,9 +6,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 public class PersonDAOImplTest {
 
@@ -41,24 +40,24 @@ public class PersonDAOImplTest {
     public void testCreate() throws Exception {
          personList.add(new Person(4,"user4",444,444));
          personDAO.create(personList.get(3));
-         assertEquals(personDAO.readById((long)4),personList.get(3));
+         assertEquals(personDAO.readById(4L),personList.get(3));
     }
 
     @Test
     public void testReadById() throws Exception {
-        assertEquals(personDAO.readById((long)2),personList.get(1));
+        assertEquals(personDAO.readById(2L),personList.get(1));
     }
 
     @Test
     public void testUpdate() throws Exception {
          personList.set(1,new Person(2,"User2_1",2221,2221));
-         personDAO.update((long)2,personList.get(1));
-         assertEquals(personDAO.readById((long)2),personList.get(1));
+         personDAO.update(2L,personList.get(1));
+         assertEquals(personDAO.readById(2L),personList.get(1));
     }
 
     @Test
     public void testDeleteById() throws Exception {
-         personDAO.deleteById((long)4);
+         personDAO.deleteById(4L);
          personList.remove(3);
          assertEquals(personDAO.readAll(),personList);
     }
