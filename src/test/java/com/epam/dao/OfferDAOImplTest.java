@@ -79,13 +79,17 @@ public class OfferDAOImplTest {
     public void testReadById() throws Exception {
         assertEquals(offerDAO.readById(1L),offerList.get(0));
     }
-//
-//    @Test
-//    public void testUpdate() throws Exception {
-//    }
-//
+
+    @Test
+    public void testUpdate() throws Exception {
+        Offer newOffer = new Offer(1,3,"333",333,true);
+        offerDAO.update(1L,newOffer);
+        assertEquals(offerDAO.readById(1L),newOffer);
+    }
+
 //    @Test
 //    public void testDeleteById() throws Exception {
+//
 //    }
 
 }
