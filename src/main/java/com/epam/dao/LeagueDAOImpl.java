@@ -1,85 +1,123 @@
 package com.epam.dao;
 
 import com.epam.model.League;
+import com.epam.net.HttpCodes;
+import com.epam.net.HttpResponse;
 import com.epam.store.ConnectionPool;
-import lombok.SneakyThrows;
+import io.vavr.Tuple2;
 import lombok.val;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class LeagueDAOImpl implements LeagueDAO {
     /**
      * SQL queries that calls stored procedures in database
      */
-    private static final String SELECT_ALL = "SELECT id, name FROM select_all_leagues()";
-    private static final String SELECT_BY_ID = "SELECT id, name FROM select_league_by_id(?)";
-    private static final String INSERT = "SELECT insert_league(?)";
-    private static final String DELETE = "SELECT delete_league(?)";
-    private static final String UPDATE = "SELECT update_league(?, ?)";
+    private static final String SELECT_ALL =
+            "SELECT id, name FROM select_all_leagues()";
+    private static final String SELECT_BY_ID =
+            "SELECT id, name FROM select_league_by_id(?)";
+    private static final String INSERT =
+            "SELECT id, name FROM insert_league(?)";
+    private static final String UPDATE =
+            "SELECT id, name FROM update_league(?, ?)";
+    private static final String DELETE =
+            "SELECT delete_league(?)";
 
-    @SneakyThrows
+    public static final LeagueDAO LEAGUE_DAO = new LeagueDAOImpl();
+
+    private LeagueDAOImpl() {}
+
     @Override
-    public List<League> readAll() {
+    public List<League> readAll() throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
             val list = new ArrayList<League>();
             while (resultSet.next()) {
-                list.add(new League(resultSet.getLong("id"),
-                        resultSet.getString("name")));
+                list.add(League.getFromResultSet(resultSet));
             }
             return list;
         }
     }
 
-    @SneakyThrows
     @Override
-    public void create(League league) {
+    public League create(League league) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT)) {
             preparedStatement.setString(1, league.getName());
-            preparedStatement.execute();
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return League.getFromResultSet(resultSet);
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
         }
     }
 
-    @SneakyThrows
     @Override
-    public League read(Long id) {
+    public League read(Long id) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return new League(resultSet.getLong("id"), resultSet.getString("name"));
+                    return League.getFromResultSet(resultSet);
+                } else {
+                    throw new NoSuchElementException();
                 }
             }
-            return null;
         }
     }
 
-    @SneakyThrows
     @Override
-    public void update(Long id, League league) {
+    public League update(Long id, League league) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE)) {
             preparedStatement.setLong(1, id);
             preparedStatement.setString(2, league.getName());
-            preparedStatement.execute();
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return League.getFromResultSet(resultSet);
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
         }
     }
 
-    @SneakyThrows
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long id) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE)) {
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
         }
+    }
+
+    @Override
+    public HttpResponse respondOnGET(List<Tuple2<String, Long>> tuples) {
+        String json;
+        try {
+            Tuple2<String, Long> tuple = tuples.get(0);
+            if (tuples.size() == 1) {
+                if (tuple._2 == null) {
+                    json = gson.toJson(readAll());
+                } else {
+                    json = gson.toJson(read(tuple._2));
+                }
+            } else {
+                json = gson.toJson(EventDAOImpl.EVENT_DAO.readEventsByLeagueId(tuple._2));
+            }
+        } catch (SQLException e) {
+            return new HttpResponse(HttpCodes.INTERNAL_SERVER_ERROR);
+        } catch (NoSuchElementException e) {
+            return new HttpResponse(HttpCodes.NOT_FOUND);
+        }
+        return new HttpResponse(json);
     }
 }

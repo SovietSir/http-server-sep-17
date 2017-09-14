@@ -1,13 +1,16 @@
 package com.epam.dao;
 
 import com.epam.model.Event;
+import com.epam.net.HttpCodes;
+import com.epam.net.HttpResponse;
 import com.epam.store.ConnectionPool;
-import lombok.SneakyThrows;
+import io.vavr.Tuple2;
 import lombok.val;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class EventDAOImpl implements EventDAO {
     /**
@@ -19,54 +22,46 @@ public class EventDAOImpl implements EventDAO {
             "SELECT id, league_id, date, home_team, guest_team, score FROM select_events_by_league_id(?)";
     private static final String SELECT_BY_ID =
             "SELECT id, league_id, date, home_team, guest_team, score FROM select_event_by_id(?)";
-    private static final String INSERT = "SELECT insert_event(?, ?, ?, ?, ?)";
-    private static final String DELETE = "SELECT delete_event(?)";
-    private static final String UPDATE = "SELECT update_event(?, ?, ?, ?, ?, ?)";
+    private static final String INSERT =
+            "SELECT id, league_id, date, home_team, guest_team, score FROM insert_event(?, ?, ?, ?, ?)";
+    private static final String UPDATE =
+            "SELECT id, league_id, date, home_team, guest_team, score FROM update_event(?, ?, ?, ?, ?, ?)";
+    private static final String DELETE =
+            "SELECT delete_event(?)";
 
-    @SneakyThrows
+    public static final EventDAO EVENT_DAO = new EventDAOImpl();
+
+    private EventDAOImpl() {}
+
     @Override
-    public List<Event> readAll() {
+    public List<Event> readAll() throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
             val list = new ArrayList<Event>();
             while (resultSet.next()) {
-                list.add(new Event(resultSet.getLong("id"),
-                        resultSet.getLong("league_id"),
-                        resultSet.getTimestamp("date").toLocalDateTime(),
-                        resultSet.getString("home_team"),
-                        resultSet.getString("guest_team"),
-                        resultSet.getString("score")
-                ));
+                list.add(Event.getFromResultSet(resultSet));
             }
             return list;
         }
     }
 
-    @SneakyThrows
     @Override
-    public List<Event> readEventsByLeagueId(long leagueId) {
+    public List<Event> readEventsByLeagueId(long leagueId) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_LEAGUE_ID)) {
             preparedStatement.setLong(1, leagueId);
             ResultSet resultSet = preparedStatement.executeQuery();
             val list = new ArrayList<Event>();
             while (resultSet.next()) {
-                list.add(new Event(resultSet.getLong("id"),
-                        resultSet.getLong("league_id"),
-                        resultSet.getTimestamp("date").toLocalDateTime(),
-                        resultSet.getString("home_team"),
-                        resultSet.getString("guest_team"),
-                        resultSet.getString("score")
-                ));
+                list.add(Event.getFromResultSet(resultSet));
             }
             return list;
         }
     }
 
-    @SneakyThrows
     @Override
-    public void create(Event event) {
+    public Event create(Event event) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT)) {
             preparedStatement.setLong(1, event.getLeagueId());
@@ -74,33 +69,33 @@ public class EventDAOImpl implements EventDAO {
             preparedStatement.setString(3, event.getHomeTeam());
             preparedStatement.setString(4, event.getGuestTeam());
             preparedStatement.setString(5, event.getScore());
-            preparedStatement.execute();
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Event.getFromResultSet(resultSet);
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
         }
     }
 
-    @SneakyThrows
     @Override
-    public Event read(Long id) {
+    public Event read(Long id) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return new Event(resultSet.getLong("id"),
-                            resultSet.getLong("league_id"),
-                            resultSet.getTimestamp("date").toLocalDateTime(),
-                            resultSet.getString("home_team"),
-                            resultSet.getString("guest_team"),
-                            resultSet.getString("score"));
+                    return Event.getFromResultSet(resultSet);
+                } else {
+                    throw new NoSuchElementException();
                 }
             }
-            return null;
         }
     }
 
-    @SneakyThrows
     @Override
-    public void update(Long id, Event event) {
+    public Event update(Long id, Event event) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE)) {
             preparedStatement.setLong(1, id);
@@ -109,17 +104,44 @@ public class EventDAOImpl implements EventDAO {
             preparedStatement.setString(4, event.getHomeTeam());
             preparedStatement.setString(5, event.getGuestTeam());
             preparedStatement.setString(6, event.getScore());
-            preparedStatement.execute();
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Event.getFromResultSet(resultSet);
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
         }
     }
 
-    @SneakyThrows
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long id) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE)) {
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
         }
+    }
+
+    @Override
+    public HttpResponse respondOnGET(List<Tuple2<String, Long>> tuples) {
+        String json;
+        try {
+            Tuple2<String, Long> tuple = tuples.get(0);
+            if (tuples.size() == 1) {
+                if (tuple._2 == null) {
+                    json = gson.toJson(readAll());
+                } else {
+                    json = gson.toJson(read(tuple._2));
+                }
+            } else {
+                json = gson.toJson(OfferDAOImpl.OFFER_DAO.readOffersByEventId(tuple._2));
+            }
+        } catch (SQLException e) {
+            return new HttpResponse(HttpCodes.INTERNAL_SERVER_ERROR);
+        } catch (NoSuchElementException e) {
+            return new HttpResponse(HttpCodes.NOT_FOUND);
+        }
+        return new HttpResponse(json);
     }
 }
