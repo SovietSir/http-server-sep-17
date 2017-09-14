@@ -59,10 +59,12 @@ public class EventDAOImplTest {
 
     @Test
     public void testUpdate() throws Exception {
+        eventList.set(0,new Event(1, 1, from(Instant.parse("2010-09-06T13:30:45.00Z")), "Dinamo111", "Sokol111", "3:2"));
+        eventDAO.update((long)1,eventList.get(0));
+        assertEquals(eventDAO.readById((long)1),eventList.get(0));
     }
 
     @Test
     public void testDeleteById() throws Exception {
     }
-
 }
