@@ -67,18 +67,24 @@ class Respondent {
 
     private HttpResponse getResponseFromCorrectInput
             (HttpMethod method, List<Tuple2<String, Long>> tuples, String body) {
+        HttpResponse response;
         switch (method) {
             case GET:
-                return respondOnGET(tuples);
+                response = respondOnGET(tuples);
+                break;
             case POST:
-                return respondOnPOST(tuples, body);
+                response = respondOnPOST(tuples, body);
+                break;
             case PUT:
-                return respondOnPUT(tuples, body);
+                response = respondOnPUT(tuples, body);
+                break;
             case DELETE:
-                return respondOnDELETE(tuples);
+                response = respondOnDELETE(tuples);
+                break;
             default:
                 return new HttpResponse(HttpCodes.NOT_IMPLEMENTED);
         }
+        return response == null ? new HttpResponse(HttpCodes.BAD_REQUEST) : response;
     }
 
     /**
@@ -93,9 +99,25 @@ class Respondent {
         if (tokens.length == 0) return null;
         int idx = 0;
         val list = new ArrayList<Tuple2<String, Long>>(2);
+        String nextDir = null;
         while (idx < tokens.length) {
             String entity = tokens[idx++];
             if (Arrays.binarySearch(PATHS, entity) < 0) return null;
+            if (nextDir != null && !entity.equals(nextDir)) return null;
+            switch (entity) {
+                case "leagues":
+                    nextDir = "events";
+                    break;
+                case "events":
+                    nextDir = "offers";
+                    break;
+                case "offers":
+                case "persons":
+                    nextDir = "bets";
+                    break;
+                default:
+                    nextDir = null;
+            }
             Long id = null;
             if (!(idx == tokens.length)) {
                 id = extractLong(tokens[idx++]);
@@ -116,6 +138,8 @@ class Respondent {
     }
 
     private HttpResponse respondOnGET(List<Tuple2<String, Long>> tuples) {
+        if (tuples.size() > 2) return null;
+        if (tuples.size() == 2 && tuples.get(1)._2 != null) return null;
         try {
             switch (tuples.get(0)._1) {
                 case "leagues":
@@ -153,13 +177,11 @@ class Respondent {
             return new HttpResponse(HttpCodes.NOT_FOUND);
         } catch (NullPointerException ignored) {
         }
-        return new HttpResponse(HttpCodes.BAD_REQUEST);
+        return null;
     }
 
     private HttpResponse respondOnPOST(List<Tuple2<String, Long>> tuples, String body) {
-        if (!(tuples.size() == 1 && tuples.get(0)._2 != null)) {
-            return new HttpResponse(HttpCodes.BAD_REQUEST);
-        }
+        if (tuples.size() != 1 || tuples.get(0)._2 == null) return null;
         Tuple2<String, Long> tuple = tuples.get(0);
         switch (tuple._1) {
             case "leagues":
@@ -178,15 +200,13 @@ class Respondent {
                 betDAO.update(tuple._2, gson.fromJson(body, Bet.class));
                 break;
             default:
-                return new HttpResponse(HttpCodes.BAD_REQUEST);
+                return null;
         }
         return new HttpResponse(HttpCodes.OK);
     }
 
     private HttpResponse respondOnPUT(List<Tuple2<String, Long>> tuples, String body) {
-        if (!(tuples.size() == 1 && tuples.get(0)._2 == null)) {
-            return new HttpResponse(HttpCodes.BAD_REQUEST);
-        }
+        if (tuples.size() != 1 || tuples.get(0)._2 != null) return null;
         switch (tuples.get(0)._1) {
             case "leagues":
                 leagueDAO.create(gson.fromJson(body, League.class));
@@ -204,15 +224,13 @@ class Respondent {
                 betDAO.create(gson.fromJson(body, Bet.class));
                 break;
             default:
-                return new HttpResponse(HttpCodes.BAD_REQUEST);
+                return null;
         }
         return new HttpResponse(HttpCodes.OK);
     }
 
     private HttpResponse respondOnDELETE(List<Tuple2<String, Long>> tuples) {
-        if (!(tuples.size() == 1 && tuples.get(0)._2 != null)) {
-            return new HttpResponse(HttpCodes.BAD_REQUEST);
-        }
+        if (tuples.size() != 1 || tuples.get(0)._2 != null) return null;
         Tuple2<String, Long> tuple = tuples.get(0);
         switch (tuple._1) {
             case "leagues":
@@ -231,7 +249,7 @@ class Respondent {
                 betDAO.deleteById(tuple._2);
                 break;
             default:
-                return new HttpResponse(HttpCodes.BAD_REQUEST);
+                return null;
         }
         return new HttpResponse(HttpCodes.OK);
     }
