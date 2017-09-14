@@ -87,7 +87,7 @@ public class EventDAOImpl implements EventDAO {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    new Event(resultSet.getLong("id"),
+                    return new Event(resultSet.getLong("id"),
                             resultSet.getLong("league_id"),
                             resultSet.getTimestamp("date").toLocalDateTime(),
                             resultSet.getString("home_team"),
