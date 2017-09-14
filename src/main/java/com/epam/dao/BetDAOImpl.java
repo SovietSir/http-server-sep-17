@@ -17,11 +17,11 @@ public class BetDAOImpl implements BetDAO {
      * SQL queries that calls stored procedures in database
      */
     private static final String SELECT_BY_ID =
-            "SELECT id, person_id, bet_id, amount, gain FROM select_bet_by_id(?)";
+            "SELECT id, person_id, offer_id, amount, gain FROM select_bet_by_id(?)";
     private static final String SELECT_BY_PERSON_ID =
-            "SELECT id, person_id, bet_id, amount, gain FROM select_bets_by_person_id(?)";
+            "SELECT id, person_id, offer_id, amount, gain FROM select_bets_by_person_id(?)";
     private static final String SELECT_BY_OFFER_ID =
-            "SELECT id, person_id, bet_id, amount, gain FROM select_bets_by_offer_id(?)";
+            "SELECT id, person_id, offer_id, amount, gain FROM select_bets_by_offer_id(?)";
     private static final String INSERT = "SELECT insert_bet(?, ?, ?, ?)";
     private static final String DELETE = "SELECT delete_bet(?)";
     private static final String UPDATE = "SELECT update_bet(?, ?, ?, ?, ?)";
