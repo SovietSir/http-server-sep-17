@@ -20,8 +20,8 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok:+'
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:+',
-            'org.testng:testng:+'
+    testCompile 'org.testng:testng:+',
+            'org.mockito:mockito-core:+'
 }
 
 jacoco {
