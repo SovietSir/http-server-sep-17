@@ -53,13 +53,15 @@ public class LeagueDAOImplTest {
 
     @Test
     public void testUpdate() throws Exception {
-        leagueDAO.update((long)5,new League(5,"NEW TEST LEAGUE"));
-        leaguesList.set(4,new League(5,"NEW TEST LEAGUE"));
-        assertEquals(leagueDAO.readById((long)5),leaguesList.get(4));
+        leagueDAO.update((long)1,new League(1,"NEW TEST LEAGUE"));
+        leaguesList.set(0,new League(1,"NEW TEST LEAGUE"));
+        assertEquals(leagueDAO.readById((long)1),leaguesList.get(0));
     }
 
     @Test
     public void testDeleteById() throws Exception {
-
+        leagueDAO.deleteById((long)5);
+        leaguesList.remove(4);
+        assertEquals(leagueDAO.readAll(),leaguesList);
     }
 }
