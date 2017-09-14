@@ -1,35 +1,51 @@
 package com.epam.dao;
 
 import com.epam.model.Event;
+import com.epam.model.League;
 import com.epam.store.ConnectionPool;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import static java.time.LocalDateTime.from;
-import static org.testng.Assert.*;
+import static java.time.LocalDateTime.parse;
+import static org.testng.Assert.assertEquals;
 
 public class EventDAOImplTest {
 
     private EventDAOImpl eventDAO;
     private ArrayList<Event> eventList;
+    private LeagueDAOImpl leagueDAO;
+    private ArrayList<League> leaguesList;
 
     @BeforeClass
     void setup(){
         eventDAO = new EventDAOImpl();
         eventList = new ArrayList<>();
 
+        leagueDAO = new LeagueDAOImpl();
+        leaguesList = new ArrayList<>();
+
         ConnectionPool.pool.dropDatabase();
         ConnectionPool.pool.initDatabase();
 
-        eventList.add(new Event(1, 1, from(Instant.parse("2007-12-03T10:15:30.00Z")), "Zenith", "Nadir", "0:2"));
-        eventList.add(new Event(2, 1, from(Instant.parse("2008-11-04T11:20:35.00Z")), "Andji", "Tom", "1:3"));
-        eventList.add(new Event(3, 1, from(Instant.parse("2009-10-05T12:25:40.00Z")), "Bavaria", "MU", "0:0"));
-        eventList.add(new Event(4, 1, from(Instant.parse("2010-09-06T13:30:45.00Z")), "Dinamo", "Sokol", "3:2"));
+        leaguesList.add(new League(1, "RFPL"));
+        leaguesList.add(new League(2, "APL"));
+        leaguesList.add(new League(3, "PDL"));
+        leaguesList.add(new League(4, "USPL"));
+        leaguesList.add(new League(5,"TEST LEAGUE"));
 
+        leagueDAO.create(leaguesList.get(0));
+        leagueDAO.create(leaguesList.get(1));
+        leagueDAO.create(leaguesList.get(2));
+        leagueDAO.create(leaguesList.get(3));
+        leagueDAO.create(leaguesList.get(4));
+
+
+        eventList.add(new Event(1, 1,  parse("2007-12-03T15:15:30"), "Zenith", "Nadir", "0:2"));
+        eventList.add(new Event(2, 1,  parse("2007-12-03T15:15:30"), "Andji", "Tom", "1:3"));
+        eventList.add(new Event(3, 1,  parse("2007-12-03T15:15:30"), "Bavaria", "MU", "0:0"));
+        eventList.add(new Event(4, 1,  parse("2007-12-03T15:15:30"), "Dinamo", "Sokol", "3:2"));
 
         eventDAO.create(eventList.get(0));
         eventDAO.create(eventList.get(1));
@@ -42,30 +58,28 @@ public class EventDAOImplTest {
         assertEquals(eventDAO.readAll(),eventList);
     }
 
-    @Test
-    public void testReadEventsByLeagueId() throws Exception {
-    }
+//    @Test
+//    public void testReadEventsByLeagueId() throws Exception {
+//    }
 
     @Test
     public void testCreate() throws Exception {
-        eventList.add(new Event(5, 5, from(Instant.parse("2010-09-06T13:30:45.00Z")), "Dinamo", "Sokol", "3:2"));
-        eventDAO.create(eventList.get(4));
-        assertEquals(eventDAO.readById((long)5), eventList.get(4));
+        eventList.add(new Event(5, 2,  parse("2007-12-03T15:15:30"), "Dinamo", "Sokol", "3:2"));
+        eventDAO.create(new Event(5, 2,  parse("2007-12-03T15:15:30"), "Dinamo", "Sokol", "3:2"));
+        assertEquals(eventDAO.readById(5L), eventList.get(4));
     }
 
-    @Test
-    public void testReadById() throws Exception {
-        assertEquals(eventDAO.readById((long)1), eventList.get(0));
-    }
+//
+//    @Test
+//    public void testUpdate() throws Exception {
+//        eventList.set(0,new Event(1, 1, parse("2007-12-03T15:15:30"), "Dinamo111", "Sokol111", "3:2"));
+//        eventDAO.update(1L,eventList.get(0));
+//        assertEquals(eventDAO.readById(1L),eventList.get(0));
+//    }
 
-    @Test
-    public void testUpdate() throws Exception {
-        eventList.set(0,new Event(1, 1, from(Instant.parse("2010-09-06T13:30:45.00Z")), "Dinamo111", "Sokol111", "3:2"));
-        eventDAO.update((long)1,eventList.get(0));
-        assertEquals(eventDAO.readById((long)1),eventList.get(0));
-    }
+//    @Test
+//    public void testDeleteById() throws Exception {
+//
+//    }
 
-    @Test
-    public void testDeleteById() throws Exception {
-    }
 }
