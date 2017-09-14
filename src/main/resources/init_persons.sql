@@ -33,10 +33,12 @@ END;
 $$ LANGUAGE plpgsql STABLE;
 
 CREATE OR REPLACE FUNCTION insert_person(person_login VARCHAR(100), person_password_hash INT, person_balance BIGINT)
-  RETURNS VOID AS $$
+  RETURNS SETOF PERSON AS $$
 BEGIN
+  RETURN QUERY
   INSERT INTO person (login, password_hash, balance)
-  VALUES (person_login, person_password_hash, person_balance);
+  VALUES (person_login, person_password_hash, person_balance)
+  RETURNING *;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
@@ -50,10 +52,12 @@ $$ LANGUAGE plpgsql VOLATILE;
 
 CREATE OR REPLACE FUNCTION update_person(person_id      BIGINT, person_login VARCHAR(100), person_password_hash INT,
                                          person_balance BIGINT)
-  RETURNS VOID AS $$
+  RETURNS SETOF PERSON AS $$
 BEGIN
+  RETURN QUERY
   UPDATE person
   SET login = person_login, password_hash = person_password_hash, balance = person_balance
-  WHERE id = person_id;
+  WHERE id = person_id
+  RETURNING *;
 END;
 $$ LANGUAGE plpgsql VOLATILE;

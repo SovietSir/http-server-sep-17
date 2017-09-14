@@ -52,10 +52,12 @@ $$ LANGUAGE plpgsql STABLE;
 
 CREATE OR REPLACE FUNCTION insert_offer(offer_event_id BIGINT, offer_description VARCHAR(100), offer_coefficient FLOAT,
                                         offer_result   BOOLEAN)
-  RETURNS VOID AS $$
+  RETURNS SETOF OFFER AS $$
 BEGIN
+  RETURN QUERY
   INSERT INTO offer (event_id, description, coefficient, result)
-  VALUES (offer_event_id, offer_description, offer_coefficient, offer_result);
+  VALUES (offer_event_id, offer_description, offer_coefficient, offer_result)
+  RETURNING *;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
@@ -69,10 +71,12 @@ $$ LANGUAGE plpgsql VOLATILE;
 
 CREATE OR REPLACE FUNCTION update_offer(offer_id          BIGINT, offer_event_id BIGINT, offer_description VARCHAR(100),
                                         offer_coefficient FLOAT, offer_result BOOLEAN)
-  RETURNS VOID AS $$
+  RETURNS SETOF OFFER AS $$
 BEGIN
+  RETURN QUERY
   UPDATE offer
   SET event_id = offer_event_id, description = offer_description, coefficient = offer_coefficient, result = offer_result
-  WHERE id = offer_id;
+  WHERE id = offer_id
+  RETURNING *;
 END;
 $$ LANGUAGE plpgsql VOLATILE;

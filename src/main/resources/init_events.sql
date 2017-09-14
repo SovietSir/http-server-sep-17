@@ -56,10 +56,11 @@ $$ LANGUAGE plpgsql STABLE;
 
 CREATE OR REPLACE FUNCTION insert_event(event_league_id  BIGINT, event_date TIMESTAMP, event_home_team VARCHAR(50),
                                         event_guest_team VARCHAR(50), event_score VARCHAR(10))
-  RETURNS VOID AS $$
+  RETURNS SETOF EVENT AS $$
 BEGIN
-  INSERT INTO event (league_id, date, home_team, guest_team, score)
-  VALUES (event_league_id, event_date, event_home_team, event_guest_team, event_score);
+  RETURN QUERY INSERT INTO event (league_id, date, home_team, guest_team, score)
+  VALUES (event_league_id, event_date, event_home_team, event_guest_team, event_score)
+  RETURNING *;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
@@ -74,11 +75,11 @@ $$ LANGUAGE plpgsql VOLATILE;
 CREATE OR REPLACE FUNCTION update_event(event_id        BIGINT, event_league_id BIGINT, event_date TIMESTAMP,
                                         event_home_team VARCHAR(50), event_guest_team VARCHAR(50),
                                         event_score     VARCHAR(10))
-  RETURNS VOID AS $$
+  RETURNS SETOF EVENT AS $$
 BEGIN
-  UPDATE event
+  RETURN QUERY UPDATE event
   SET league_id = event_league_id, date = event_date, home_team = event_home_team, guest_team = event_guest_team,
     score       = event_score
-  WHERE id = event_id;
+  WHERE id = event_id RETURNING *;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
