@@ -90,6 +90,7 @@ class Respondent {
     List<Tuple2<String, Long>> parse(String path) {
         if (!path.startsWith("/")) return null;
         String[] tokens = path.substring(1).split("/");
+        if (tokens.length == 0) return null;
         int idx = 0;
         val list = new ArrayList<Tuple2<String, Long>>(2);
         while (idx < tokens.length) {
