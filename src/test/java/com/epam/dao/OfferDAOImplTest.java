@@ -61,10 +61,10 @@ public class OfferDAOImplTest {
         offerDAO.create(offerList.get(2));
     }
 
-//    @Test
-//    public void testReadOffersByEventId() throws Exception {
-//
-//    }
+    @Test
+    public void testReadOffersByEventId() throws Exception {
+        assertEquals(offerDAO.readOffersByEventId(1L).get(0),offerList.get(0));
+    }
 
     @Test
     public void testCreate() throws Exception {
@@ -87,8 +87,8 @@ public class OfferDAOImplTest {
 
     @Test
     public void testDeleteById() throws Exception {
-        offerDAO.deleteById(1L);
-        assertNull(offerDAO.readById(1L));
+        offerDAO.deleteById(2L);
+        assertNull(offerDAO.readById(2L));
     }
 
 }
