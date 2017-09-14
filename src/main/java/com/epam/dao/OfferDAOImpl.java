@@ -65,7 +65,7 @@ public class OfferDAOImpl implements OfferDAO {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    new Offer(resultSet.getLong("id"),
+                    return new Offer(resultSet.getLong("id"),
                             resultSet.getLong("event_id"),
                             resultSet.getString("description"),
                             resultSet.getFloat("coefficient"),

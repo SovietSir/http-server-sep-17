@@ -87,7 +87,7 @@ public class BetDAOImpl implements BetDAO {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    new Bet(resultSet.getLong("id"),
+                    return new Bet(resultSet.getLong("id"),
                             resultSet.getLong("person_id"),
                             resultSet.getLong("offer_id"),
                             resultSet.getLong("amount"),
