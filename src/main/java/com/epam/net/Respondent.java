@@ -46,7 +46,11 @@ class Respondent {
 
         String path = methodAndPath[1];
         if (path.equals("/")) {
-            return new HttpResponse("{\"content\": \"start page\"}");
+            if (method == HttpMethod.GET) {
+                return new HttpResponse("{\"content\": \"start page\"}");
+            } else {
+                return new HttpResponse(HttpCodes.BAD_REQUEST);
+            }
         }
         List<Tuple2<String, Long>> tuples = parse(path);
         if (tuples == null) {
