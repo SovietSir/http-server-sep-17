@@ -5,6 +5,8 @@ import com.epam.model.*;
 import com.google.gson.*;
 
 import io.vavr.Tuple2;
+import org.mockito.ArgumentMatcher;
+import org.mockito.internal.matchers.*;
 import org.testng.annotations.*;
 
 import java.sql.SQLException;
@@ -35,7 +37,6 @@ public class RespondentTest {
     private static final HttpResponse BAD_REQUEST = new HttpResponse(HttpCodes.BAD_REQUEST);
     private static final HttpResponse NOT_IMPLEMENTED = new HttpResponse(HttpCodes.NOT_IMPLEMENTED);
     private static final HttpResponse NOT_FOUND = new HttpResponse(HttpCodes.NOT_FOUND);
-    private static final HttpResponse METHOD_NOT_ALLOWED = new HttpResponse(HttpCodes.METHOD_NOT_ALLOWED);
     private static final HttpResponse INTERNAL_SERVER_ERROR = new HttpResponse(HttpCodes.INTERNAL_SERVER_ERROR);
     private static final HttpResponse OK = new HttpResponse(HttpCodes.OK);
     private HttpResponse defaultLeagueResponce;
@@ -85,12 +86,12 @@ public class RespondentTest {
         defaultBetResponce = new HttpResponse(HttpCodes.OK, defaultHeaders, defaultBodies.get("Bet"));
         defaultPersonResponce = new HttpResponse(HttpCodes.OK, defaultHeaders, defaultBodies.get("Person"));
 
-//        badBodies = new HashMap<String, String>();
-//        badBodies.put("League", "{\"id\":1, \"name\":\"RFPL\"}");
-//        badBodies.put("Event", "{\"id\":1, \"eventId\":1, \"date\":\"2007-12-03T15:15:30\", \"homeTeam\":\"Zenith\", \"guestTeam\":\"Zenith\", \"score\":\"0:1\"}");
-//        badBodies.put("Offer", "{\"id\":1, \"eventId\":1, \"description\":\"Some descr.\", \"coefficient\":0.75f, \"result\":\"true\"}");
-//        badBodies.put("Bet", "{\"id\":1, \"personId\":1, \"eventId\":1, \"amount\":150L, \"gain\":88.14f}");
-//        badBodies.put("Person", "{\"id\":1, \"login\":\"admin\", \"passwordHash\":39210433, \"balance\":11150L");
+        badBodies = new HashMap<String, String>();
+        badBodies.put("League", "{\"id\":\"Some descr.\",\"name\":\"RFPL\"}");
+        badBodies.put("Event", "{\"id\":1,\"leagueId\":1,\"date\":\"03-11-2007T15:15\",\"homeTeam\":\"Zenit\",\"guestTeam\":\"Zenith\",\"score\":\"0:1\"}");
+        badBodies.put("Offer", "{\"id\":1,\"eventId\":1,\"description\":20,\"coefficient\":\"passwordHash\",\"result\":true}");
+        badBodies.put("Bet", "{\"id\":1,\"personId\":1,\"offerId\":1,\"amount\":true,\"gain\":88.14}");
+        badBodies.put("Person", "{\"id\":1,\"login\":\"admin\",\"passwordHash\":39210433,\"balance\":11150}");
 
         leaguesList.add(new League(1, "RFPL"));
         leaguesList.add(new League(2, "APL"));
@@ -129,9 +130,13 @@ public class RespondentTest {
         when(LEAGUE_DAO.read(1L)).thenReturn(leaguesList.get(1));
         when(LEAGUE_DAO.read(2L)).thenReturn(leaguesList.get(2));
         when(LEAGUE_DAO.read(3L)).thenReturn(leaguesList.get(3));
+        when(LEAGUE_DAO.read(longThat(new GreaterOrEqual<>((long) leaguesList.size())))).thenThrow(new NoSuchElementException());
+        when(LEAGUE_DAO.read(longThat(new LessThan<>(0L)))).thenThrow(new NoSuchElementException());
         when(LEAGUE_DAO.readSubLevel(anyLong())).thenReturn(eventsList);
         when(LEAGUE_DAO.create(any(League.class))).thenReturn(defaultLeague);
-        when(LEAGUE_DAO.update(anyLong(), any(League.class))).thenReturn(defaultLeague);
+        when(LEAGUE_DAO.update(longThat(new GreaterThan<>(1L)), any(League.class))).thenThrow(new NoSuchElementException());
+        when(LEAGUE_DAO.update(1L, defaultLeague)).thenReturn(defaultLeague);
+        when(LEAGUE_DAO.update(longThat(new LessThan<>(1L)), any(League.class))).thenThrow(new NoSuchElementException());
         when(LEAGUE_DAO.getModelClass()).thenReturn(League.class);
         doNothing().when(LEAGUE_DAO).delete(anyLong());
 
@@ -276,18 +281,19 @@ public class RespondentTest {
     public Object[][] badGetRequests() {
         return new Object[][]{
                 // Bad request
-                {"someRubbish", NOT_IMPLEMENTED},
+//                {"someRubbish", NOT_IMPLEMENTED},
                 // Bad URL
-                {"GET /// HTTP/1.1", BAD_REQUEST},
-                {"GET * HTTP/1.1", BAD_REQUEST},
+//                {"GET /// HTTP/1.1", BAD_REQUEST},
+//                {"GET * HTTP/1.1", BAD_REQUEST},
+                {"GET /users HTTP/1.1", BAD_REQUEST},
                 // Non-implemented (or unknown) method
-                {"HEAD / HTTP/1.1", NOT_IMPLEMENTED},
-                // denied routes
-                {"GET /offers HTTP/1.1", BAD_REQUEST},
-                {"GET /bets HTTP/1.1", BAD_REQUEST},
-                {"GET /bets/3/any HTTP/1.1", BAD_REQUEST},
-                // non-existent instances
-//                {"GET /leagues/6 HTTP/1.1", BAD_REQUEST},
+//                {"HEAD / HTTP/1.1", NOT_IMPLEMENTED},
+//                // denied routes
+//                {"GET /offers HTTP/1.1", BAD_REQUEST},
+//                {"GET /bets HTTP/1.1", BAD_REQUEST},
+//                {"GET /bets/3/any HTTP/1.1", BAD_REQUEST},
+//                // non-existent instances
+//                {"GET /leagues/999 HTTP/1.1", NOT_FOUND},
         };
 
     }
@@ -306,8 +312,8 @@ public class RespondentTest {
     @DataProvider(name = "Bad Put Requests")
     public Object[][] badPutRequests() {
         return new Object[][]{
-                //non-existent route
-                //{String.format("PUT / HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), new HttpResponse(HttpCodes.BAD_REQUEST)},
+                //non-existent routes
+                //{String.format("PUT / HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 {String.format("PUT /bad HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 {String.format("PUT /leagues/events HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 //existent, but denied routes
@@ -315,38 +321,50 @@ public class RespondentTest {
                 {String.format("PUT /leagues/3/events HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 //bad JSONs
                 {"PUT /leagues/3 HTTP/1.1\r\n\r\nsomeRubbish", BAD_REQUEST},
-                {String.format("PUT /leagues/3/events HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
+                {String.format("PUT /leagues HTTP/1.1\r\n\r\n%s", badBodies.get("League")), BAD_REQUEST},
+                {String.format("PUT /events HTTP/1.1\r\n\r\n%s", badBodies.get("Event")), BAD_REQUEST},
         };
     }
 
     @DataProvider(name = "Good Post Requests")
     public Object[][] goodPostRequests() {
         return new Object[][]{
-                {String.format("POST /leagues/1 HTTP/1.1\r\nheader\r\n\r\n%s", defaultBodies.get("League")), defaultLeagueResponce},
-                {String.format("POST /events/2 HTTP/1.1\r\nheader\r\n\r\n%s", defaultBodies.get("Event")), defaultEventResponce},
-                {String.format("POST /offers/2 HTTP/1.1\r\nheader\r\n\r\n%s", defaultBodies.get("Offer")), defaultOfferResponce},
-                {String.format("POST /bets/4 HTTP/1.1\r\nheader\r\n\r\n%s", defaultBodies.get("Bet")), defaultBetResponce},
-                {String.format("POST /persons/6 HTTP/1.1\r\nheader\r\n\r\n%s", defaultBodies.get("Person")), defaultPersonResponce},
+                {String.format("POST /leagues/1 HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), defaultLeagueResponce},
+                {String.format("POST /events/2 HTTP/1.1\r\n\r\n%s", defaultBodies.get("Event")), defaultEventResponce},
+                {String.format("POST /offers/2 HTTP/1.1\r\n\r\n%s", defaultBodies.get("Offer")), defaultOfferResponce},
+                {String.format("POST /bets/4 HTTP/1.1\r\n\r\n%s", defaultBodies.get("Bet")), defaultBetResponce},
+                {String.format("POST /persons/6 HTTP/1.1\r\n\r\n%s", defaultBodies.get("Person")), defaultPersonResponce},
         };
     }
 
     @DataProvider(name = "Bad Post Requests")
     public Object[][] badPostRequests() {
         return new Object[][]{
-                //non-existent route
-                //{String.format("PUT / HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), new HttpResponse(HttpCodes.BAD_REQUEST)},
+                //non-existent routes
+                //{String.format("POST / HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), new HttpResponse(HttpCodes.BAD_REQUEST)},
                 {String.format("POST /bad HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 {String.format("POST /leagues/events HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 //existent, but denied routes
                 {String.format("POST /leagues HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 {String.format("POST /leagues/3/events HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
+                //non-existent instances for update
+                {String.format("POST /leagues/0 HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), NOT_FOUND},
+                {String.format("POST /leagues/2 HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), NOT_FOUND},
+                //bad JSONs
+                {"POST /leagues/3 HTTP/1.1\r\n\r\nsomeRubbish", BAD_REQUEST},
+                {String.format("POST /offers/3 HTTP/1.1\r\n\r\n%s", badBodies.get("Offer")), BAD_REQUEST},
+                {String.format("POST /bets/4 HTTP/1.1\r\n\r\n%s", badBodies.get("Bet")), BAD_REQUEST},
         };
     }
 
     @DataProvider(name = "Good Delete Requests")
     public Object[][] goodDeleteRequests() {
         return new Object[][]{
-
+                {"DELETE /leagues/1 HTTP/1.1", OK},
+                {"DELETE /events/2 HTTP/1.1", OK},
+                {"DELETE /offers/3 HTTP/1.1", OK},
+                {"DELETE /bets/4 HTTP/1.1", OK},
+                {"DELETE /persons/5 HTTP/1.1", OK},
         };
     }
 

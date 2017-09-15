@@ -15,7 +15,6 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 
 @SuppressWarnings("ConstantConditions")
-@Setter
 class Respondent {
     private static final String[] PATHS =
             {"leagues", "events", "offers", "persons", "bets"};
