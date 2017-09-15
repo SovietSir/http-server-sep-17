@@ -1,7 +1,6 @@
 package com.epam.net;
 
 import com.epam.store.ConnectionPool;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -29,23 +28,26 @@ public class Server implements Runnable {
         this.bufferCapacity = bufferCapacity;
     }
 
-    @SneakyThrows
     public void run() {
-        log.info("Server loading...");
-        startQueueExecutors();
-        try (ServerSocketChannel serverSocketChannel = openAndBindChannel(port);
-             Selector selector = Selector.open()) {
-            serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-            log.info(() -> String.format("Server started, please visit: http://localhost:%s%n", port));
-            while (!Thread.currentThread().isInterrupted()) {
-                selector.selectNow();
-                Set<SelectionKey> keys = selector.selectedKeys();
-                keys.stream()
-                        .filter(SelectionKey::isValid)
-                        .filter(queue::notContains)
-                        .forEach(queue::add);
-                keys.clear();
+        try {
+            log.info("Server loading...");
+            startQueueExecutors();
+            try (ServerSocketChannel serverSocketChannel = openAndBindChannel(port);
+                 Selector selector = Selector.open()) {
+                serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+                log.info(() -> String.format("Server started, please visit: http://localhost:%s%n", port));
+                while (!Thread.currentThread().isInterrupted()) {
+                    selector.selectNow();
+                    Set<SelectionKey> keys = selector.selectedKeys();
+                    keys.stream()
+                            .filter(SelectionKey::isValid)
+                            .filter(queue::notContains)
+                            .forEach(queue::add);
+                    keys.clear();
+                }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -75,27 +77,36 @@ public class Server implements Runnable {
                 .configureBlocking(false);
     }
 
-    @SneakyThrows
     private void accept(SelectionKey key) {
-        SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
-        socketChannel.configureBlocking(false);
-        SelectionKey newKey = socketChannel.register(key.selector(), SelectionKey.OP_READ);
-        newKey.attach(ByteBuffer.allocateDirect(bufferCapacity));
-        log.info(() -> String.format("Accepted {%s}", socketChannel));
+        try {
+            SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
+            if (socketChannel == null)
+                return;
+            socketChannel.configureBlocking(false);
+            SelectionKey newKey = socketChannel.register(key.selector(), SelectionKey.OP_READ);
+            newKey.attach(ByteBuffer.allocateDirect(bufferCapacity));
+            log.info(() -> String.format("Accepted {%s}", socketChannel));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @SneakyThrows
     private void read(SelectionKey key) {
-        SocketChannel socketChannel = (SocketChannel) key.channel();
-        ByteBuffer buffer = (ByteBuffer) key.attachment();
-        int sumBytesRead = 0;
-        for (int bytesRead = 1; bytesRead > 0 && buffer.hasRemaining(); ) {
-            bytesRead = socketChannel.read(buffer);
-            sumBytesRead += bytesRead;
+        try {
+            SocketChannel socketChannel = (SocketChannel) key.channel();
+            ByteBuffer buffer = (ByteBuffer) key.attachment();
+            int sumBytesRead = 0;
+            for (int bytesRead = 1; bytesRead > 0 && buffer.hasRemaining(); ) {
+                bytesRead = socketChannel.read(buffer);
+                sumBytesRead += bytesRead;
+            }
+            logReadBytes(sumBytesRead);
+            buffer.flip();
+            key.interestOps(SelectionKey.OP_WRITE);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        logReadBytes(sumBytesRead);
-        buffer.flip();
-        key.interestOps(SelectionKey.OP_WRITE);
+
     }
 
     private void logReadBytes(int bytes) {
@@ -117,7 +128,6 @@ public class Server implements Runnable {
         return new String(requestBytes);
     }
 
-    @SneakyThrows
     private void writeResponse(String response, ByteBuffer buffer, SelectionKey key) {
         try (SocketChannel socketChannel = (SocketChannel) key.channel()) {
             byte[] responseBytes = response.getBytes();
@@ -128,7 +138,9 @@ public class Server implements Runnable {
                 socketChannel.write(buffer);
                 buffer.clear();
             }
-        } //channel closes here
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void main(String[] args) {
