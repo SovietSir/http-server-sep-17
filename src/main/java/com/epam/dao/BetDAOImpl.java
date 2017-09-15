@@ -5,7 +5,6 @@ import com.epam.net.HttpCodes;
 import com.epam.net.HttpResponse;
 import com.epam.store.ConnectionPool;
 import io.vavr.Tuple2;
-import lombok.val;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,7 +41,7 @@ public class BetDAOImpl implements BetDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_OFFER_ID)) {
             preparedStatement.setLong(1, offerId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            val list = new ArrayList<Bet>();
+            ArrayList<Bet> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(Bet.getFromResultSet(resultSet));
             }
@@ -56,7 +55,7 @@ public class BetDAOImpl implements BetDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_PERSON_ID)) {
             preparedStatement.setLong(1, personId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                val list = new ArrayList<Bet>();
+                ArrayList<Bet> list = new ArrayList<>();
                 while (resultSet.next()) {
                     list.add(Bet.getFromResultSet(resultSet));
                 }

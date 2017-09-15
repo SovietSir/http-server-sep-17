@@ -5,7 +5,6 @@ import com.epam.net.HttpCodes;
 import com.epam.net.HttpResponse;
 import com.epam.store.ConnectionPool;
 import io.vavr.Tuple2;
-import lombok.val;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public class PersonDAOImpl implements PersonDAO {
         try (Connection connection = ConnectionPool.pool.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
-            val list = new ArrayList<Person>();
+            ArrayList<Person> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(Person.getFromResultSet(resultSet));
             }

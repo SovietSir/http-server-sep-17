@@ -5,7 +5,6 @@ import com.epam.net.HttpCodes;
 import com.epam.net.HttpResponse;
 import com.epam.store.ConnectionPool;
 import io.vavr.Tuple2;
-import lombok.val;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class EventDAOImpl implements EventDAO {
         try (Connection connection = ConnectionPool.pool.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
-            val list = new ArrayList<Event>();
+            ArrayList<Event> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(Event.getFromResultSet(resultSet));
             }
@@ -52,7 +51,7 @@ public class EventDAOImpl implements EventDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_LEAGUE_ID)) {
             preparedStatement.setLong(1, leagueId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            val list = new ArrayList<Event>();
+            ArrayList<Event> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(Event.getFromResultSet(resultSet));
             }
