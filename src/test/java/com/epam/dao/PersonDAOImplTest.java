@@ -16,67 +16,61 @@ public class PersonDAOImplTest {
     private PersonDAO personDAO;
     private ArrayList<Person> personList;
 
-     @BeforeClass
-     void setup() throws SQLException {
-         ConnectionPool.pool.dropDatabase();
-         ConnectionPool.pool.initDatabase();
+    @BeforeClass
+    void setup() throws SQLException {
+        ConnectionPool.pool.dropDatabase();
+        ConnectionPool.pool.initDatabase();
 
-         personDAO = PersonDAOImpl.PERSON_DAO;
-         personList = new ArrayList<>();
+        personDAO = PersonDAOImpl.PERSON_DAO;
+        personList = new ArrayList<>();
 
-         personList.add(new Person(1,"user1",111,111));
-         personList.add(new Person(2,"user2",222,222));
-         personList.add(new Person(3,"user3",333,333));
+        personList.add(new Person(1, "user1", 111, 111));
+        personList.add(new Person(2, "user2", 222, 222));
+        personList.add(new Person(3, "user3", 333, 333));
 
-         personDAO.create(personList.get(0));
-         personDAO.create(personList.get(1));
-         personDAO.create(personList.get(2));
+        personDAO.create(personList.get(0));
+        personDAO.create(personList.get(1));
+        personDAO.create(personList.get(2));
     }
 
     @Test
     public void testReadAll() throws Exception {
-         assertEquals(personDAO.readAll(),personList);
+        assertEquals(personDAO.readAll(), personList);
     }
 
     @Test
     public void testCreate() throws Exception {
-         personList.add(new Person(4,"user4",444,444));
-         personDAO.create(personList.get(3));
-         assertEquals(personDAO.read(4L),personList.get(3));
+        personList.add(new Person(4, "user4", 444, 444));
+        personDAO.create(personList.get(3));
+        assertEquals(personDAO.read(4L), personList.get(3));
     }
 
     @Test
     public void testReadById() throws Exception {
-        assertEquals(personDAO.read(2L),personList.get(1));
+        assertEquals(personDAO.read(2L), personList.get(1));
     }
 
-    @Test(expectedExceptions = { NoSuchElementException.class})
+    @Test(expectedExceptions = {NoSuchElementException.class})
     public void testReadByIdWithNoSuchElementException() throws SQLException {
         personDAO.read(-1L);
     }
 
     @Test
     public void testUpdate() throws Exception {
-         personList.set(1,new Person(2,"User2_1",2221,2221));
-         personDAO.update(2L,personList.get(1));
-         assertEquals(personDAO.read(2L),personList.get(1));
+        personList.set(1, new Person(2, "User2_1", 2221, 2221));
+        personDAO.update(2L, personList.get(1));
+        assertEquals(personDAO.read(2L), personList.get(1));
     }
 
-    @Test(expectedExceptions = { NoSuchElementException.class})
+    @Test(expectedExceptions = {NoSuchElementException.class})
     public void testUpdateByIdWithNoSuchElementException() throws SQLException {
-        personDAO.update(-1L,personList.get(0));
+        personDAO.update(-1L, personList.get(0));
     }
 
     @Test
     public void testDelete() throws Exception {
-         personDAO.delete(4L);
-         personList.remove(3);
-         assertEquals(personDAO.readAll(),personList);
+        personDAO.delete(4L);
+        personList.remove(3);
+        assertEquals(personDAO.readAll(), personList);
     }
-//    @Test(expectedExceptions = {SQLException.class})
-//    public void testCreateWithException() throws Exception {
-////        personList.add(new Person(4,"user4",444,444));
-//        personDAO.create(new Person(-4,"user4",-444,-444));
-////        assertEquals(personDAO.read(4L),personList.get(3));
-//    }
 }
