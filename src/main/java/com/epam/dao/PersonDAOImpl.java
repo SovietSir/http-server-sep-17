@@ -27,7 +27,7 @@ public class PersonDAOImpl implements PersonDAO {
     private static final String DELETE =
             "SELECT delete_person(?)";
 
-    public static final PersonDAO PERSON_DAO = new PersonDAOImpl();
+    public static PersonDAO PERSON_DAO = new PersonDAOImpl();
 
     private PersonDAOImpl() {}
 

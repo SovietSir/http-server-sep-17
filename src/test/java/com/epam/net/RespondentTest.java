@@ -8,8 +8,14 @@ import com.google.gson.GsonBuilder;
 import io.vavr.Tuple2;
 import org.testng.annotations.*;
 
+import java.sql.SQLException;
 import java.util.*;
 
+import static com.epam.dao.BetDAOImpl.*;
+import static com.epam.dao.EventDAOImpl.*;
+import static com.epam.dao.LeagueDAOImpl.*;
+import static com.epam.dao.OfferDAOImpl.*;
+import static com.epam.dao.PersonDAOImpl.*;
 import static java.time.LocalDateTime.parse;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
@@ -34,7 +40,7 @@ public class RespondentTest {
     private Map<String, String> badBodies;
 
     @BeforeClass
-    void setup() {
+    void setup() throws SQLException {
         respondent = new Respondent();
         gson = new GsonBuilder()
                 .setDateFormat("dd-MM-yyyy HH:mm")
@@ -86,69 +92,63 @@ public class RespondentTest {
         personsList.add(new Person(3, "user3",56793294, 8900));
         personsList.add(new Person(4, "user4",39210433, 135000));
 
-        mockedLeagueDAO = mock(LeagueDAOImpl.class);
-        mockedEventDAO = mock(EventDAOImpl.class);
-        mockedOfferDAO = mock(OfferDAOImpl.class);
-        mockedBetDAO = mock(BetDAOImpl.class);
-        mockedPersonDAO = mock(PersonDAOImpl.class);
+        LEAGUE_DAO = mock(LeagueDAOImpl.class);
+        EVENT_DAO = mock(EventDAOImpl.class);
+        OFFER_DAO = mock(OfferDAOImpl.class);
+        BET_DAO = mock(BetDAOImpl.class);
+        PERSON_DAO = mock(PersonDAOImpl.class);
 
         //mock LeagueDAO
-        when(mockedLeagueDAO.readAll()).thenReturn(leaguesList);
-        when(mockedLeagueDAO.readById(0L)).thenReturn(leaguesList.get(0));
-        when(mockedLeagueDAO.readById(1L)).thenReturn(leaguesList.get(1));
-        when(mockedLeagueDAO.readById(2L)).thenReturn(leaguesList.get(2));
-        when(mockedLeagueDAO.readById(3L)).thenReturn(leaguesList.get(3));
-        doNothing().when(mockedLeagueDAO).create(any(League.class));
-        doNothing().when(mockedLeagueDAO).update(anyLong(), any(League.class));
-        doNothing().when(mockedLeagueDAO).deleteById(anyLong());
+        when(LEAGUE_DAO.readAll()).thenReturn(leaguesList);
+        when(LEAGUE_DAO.read(0L)).thenReturn(leaguesList.get(0));
+        when(LEAGUE_DAO.read(1L)).thenReturn(leaguesList.get(1));
+        when(LEAGUE_DAO.read(2L)).thenReturn(leaguesList.get(2));
+        when(LEAGUE_DAO.read(3L)).thenReturn(leaguesList.get(3));
+        doNothing().when(LEAGUE_DAO).create(any(League.class));
+        doNothing().when(LEAGUE_DAO).update(anyLong(), any(League.class));
+        doNothing().when(LEAGUE_DAO).deleteById(anyLong());
 
         //mock EventDAO
-        when(mockedEventDAO.readAll()).thenReturn(eventsList);
-        when(mockedEventDAO.readEventsByLeagueId(anyLong())).thenReturn(eventsList);
-        when(mockedEventDAO.readById(0L)).thenReturn(eventsList.get(0));
-        when(mockedEventDAO.readById(1L)).thenReturn(eventsList.get(1));
-        when(mockedEventDAO.readById(2L)).thenReturn(eventsList.get(2));
-        when(mockedEventDAO.readById(3L)).thenReturn(eventsList.get(3));
-        doNothing().when(mockedEventDAO).create(any(Event.class));
-        doNothing().when(mockedEventDAO).update(anyLong(), any(Event.class));
-        doNothing().when(mockedEventDAO).deleteById(anyLong());
+        when(EVENT_DAO.readAll()).thenReturn(eventsList);
+        when(EVENT_DAO.readEventsByLeagueId(anyLong())).thenReturn(eventsList);
+        when(EVENT_DAO.read(0L)).thenReturn(eventsList.get(0));
+        when(EVENT_DAO.read(1L)).thenReturn(eventsList.get(1));
+        when(EVENT_DAO.read(2L)).thenReturn(eventsList.get(2));
+        when(EVENT_DAO.read(3L)).thenReturn(eventsList.get(3));
+        doNothing().when(EVENT_DAO).create(any(Event.class));
+        doNothing().when(EVENT_DAO).update(anyLong(), any(Event.class));
+        doNothing().when(EVENT_DAO).deleteById(anyLong());
 
         //mock OfferDAO
-        when(mockedOfferDAO.readOffersByEventId(anyLong())).thenReturn(offersList);
-        when(mockedOfferDAO.readById(0L)).thenReturn(offersList.get(0));
-        when(mockedOfferDAO.readById(1L)).thenReturn(offersList.get(1));
-        when(mockedOfferDAO.readById(2L)).thenReturn(offersList.get(2));
-        when(mockedOfferDAO.readById(3L)).thenReturn(offersList.get(3));
-        doNothing().when(mockedOfferDAO).create(any(Offer.class));
-        doNothing().when(mockedOfferDAO).update(anyLong(), any(Offer.class));
-        doNothing().when(mockedOfferDAO).deleteById(anyLong());
+        when(OFFER_DAO.readOffersByEventId(anyLong())).thenReturn(offersList);
+        when(OFFER_DAO.read(0L)).thenReturn(offersList.get(0));
+        when(OFFER_DAO.read(1L)).thenReturn(offersList.get(1));
+        when(OFFER_DAO.read(2L)).thenReturn(offersList.get(2));
+        when(OFFER_DAO.read(3L)).thenReturn(offersList.get(3));
+        doNothing().when(OFFER_DAO).create(any(Offer.class));
+        doNothing().when(OFFER_DAO).update(anyLong(), any(Offer.class));
+        doNothing().when(OFFER_DAO).deleteById(anyLong());
 
         //mock BetDAO
-        when(mockedBetDAO.readBetsByOfferId(anyLong())).thenReturn(betsList);
-        when(mockedBetDAO.readBetsByPersonId(anyLong())).thenReturn(betsList);
-        when(mockedBetDAO.readById(0L)).thenReturn(betsList.get(0));
-        when(mockedBetDAO.readById(1L)).thenReturn(betsList.get(1));
-        when(mockedBetDAO.readById(2L)).thenReturn(betsList.get(2));
-        when(mockedBetDAO.readById(3L)).thenReturn(betsList.get(3));
-        doNothing().when(mockedBetDAO).create(any(Bet.class));
-        doNothing().when(mockedBetDAO).update(anyLong(), any(Bet.class));
-        doNothing().when(mockedBetDAO).deleteById(anyLong());
+        when(BET_DAO.readBetsByOfferId(anyLong())).thenReturn(betsList);
+        when(BET_DAO.readBetsByPersonId(anyLong())).thenReturn(betsList);
+        when(BET_DAO.read(0L)).thenReturn(betsList.get(0));
+        when(BET_DAO.read(1L)).thenReturn(betsList.get(1));
+        when(BET_DAO.read(2L)).thenReturn(betsList.get(2));
+        when(BET_DAO.read(3L)).thenReturn(betsList.get(3));
+        doNothing().when(BET_DAO).create(any(Bet.class));
+        doNothing().when(BET_DAO).update(anyLong(), any(Bet.class));
+        doNothing().when(BET_DAO).deleteById(anyLong());
 
         //mock PersonDAO
-        when(mockedPersonDAO.readAll()).thenReturn(personsList);
-        when(mockedPersonDAO.readById(0L)).thenReturn(personsList.get(0));
-        when(mockedPersonDAO.readById(1L)).thenReturn(personsList.get(1));
-        when(mockedPersonDAO.readById(2L)).thenReturn(personsList.get(2));
-        when(mockedPersonDAO.readById(3L)).thenReturn(personsList.get(3));
-        doNothing().when(mockedPersonDAO).create(any(Person.class));
-        doNothing().when(mockedPersonDAO).update(anyLong(), any(Person.class));
-        doNothing().when(mockedPersonDAO).deleteById(anyLong());
-
-        respondent.setLeagueDAO(mockedLeagueDAO);
-        respondent.setEventDAO(mockedEventDAO);
-        respondent.setOfferDAO(mockedOfferDAO);
-        respondent.setBetDAO(mockedBetDAO);
-        respondent.setPersonDAO(mockedPersonDAO);
+        when(PERSON_DAO.readAll()).thenReturn(personsList);
+        when(PERSON_DAO.read(0L)).thenReturn(personsList.get(0));
+        when(PERSON_DAO.read(1L)).thenReturn(personsList.get(1));
+        when(PERSON_DAO.read(2L)).thenReturn(personsList.get(2));
+        when(PERSON_DAO.read(3L)).thenReturn(personsList.get(3));
+        doNothing().when(PERSON_DAO).create(any(Person.class));
+        doNothing().when(PERSON_DAO).update(anyLong(), any(Person.class));
+        doNothing().when(PERSON_DAO).deleteById(anyLong());
 
     }
 
