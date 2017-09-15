@@ -5,6 +5,7 @@ import com.epam.store.ConnectionPool;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import static java.time.LocalDateTime.parse;
@@ -12,33 +13,35 @@ import static org.testng.Assert.*;
 
 public class BetDAOImplTest {
 
-    private BetDAOImpl betDAO;
+    private BetDAO betDAO;
+    private EventDAO eventDAO;
+    private LeagueDAO leagueDAO;
+    private OfferDAO offerDAO;
+    private PersonDAO personDAO;
+
     private ArrayList<Bet> betList;
-    private EventDAOImpl eventDAO;
-    private OfferDAOImpl offerDAO;
-    private ArrayList<Offer> offerList;
     private ArrayList<Event> eventList;
-    private LeagueDAOImpl leagueDAO;
     private ArrayList<League> leaguesList;
-    private PersonDAOImpl personDAO;
+    private ArrayList<Offer> offerList;
     private ArrayList<Person> personList;
 
     @BeforeClass
-    void setup(){
-        betDAO = new BetDAOImpl();
-        betList = new ArrayList<>();
-
-        offerDAO = new OfferDAOImpl();
-        offerList = new ArrayList<>();
-        eventList = new ArrayList<>();
-        eventDAO = new EventDAOImpl();
-        leagueDAO = new LeagueDAOImpl();
-        leaguesList = new ArrayList<>();
-        personDAO = new PersonDAOImpl();
-        personList = new ArrayList<>();
-
+    void setup() throws SQLException {
         ConnectionPool.pool.dropDatabase();
         ConnectionPool.pool.initDatabase();
+
+        betDAO = BetDAOImpl.BET_DAO;
+        eventDAO = EventDAOImpl.EVENT_DAO;
+        leagueDAO = LeagueDAOImpl.LEAGUE_DAO;
+        offerDAO = OfferDAOImpl.OFFER_DAO;
+        personDAO = PersonDAOImpl.PERSON_DAO;
+
+        betList = new ArrayList<>();
+        eventList = new ArrayList<>();
+        leaguesList = new ArrayList<>();
+        offerList = new ArrayList<>();
+        personList = new ArrayList<>();
+
 
         leaguesList.add(new League(1, "RFPL"));
         leaguesList.add(new League(2, "APL"));
@@ -99,25 +102,25 @@ public class BetDAOImplTest {
     @Test
     public void testCreate() throws Exception {
         betDAO.create(betList.get(3));
-        assertEquals(betDAO.readById(4L),betList.get(3));
+        assertEquals(betDAO.read(4L),betList.get(3));
     }
 
     @Test
     public void testReadById() throws Exception {
-        assertEquals(betDAO.readById(1L),betList.get(0));
+        assertEquals(betDAO.read(1L),betList.get(0));
     }
 
     @Test
     public void testUpdate() throws Exception {
         betList.set(1,new Bet(2,1,1,111,1));
         betDAO.update(2L,betList.get(1));
-        assertEquals(betDAO.readById(2L),betList.get(1));
+        assertEquals(betDAO.read(2L),betList.get(1));
     }
 
     @Test
     public void testDeleteById() throws Exception {
         betDAO.deleteById(4L);
         betList.remove(3);
-        assertNull(betDAO.readById(4L));
+        assertNull(betDAO.read(4L));
     }
 }
