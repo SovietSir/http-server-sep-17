@@ -31,7 +31,7 @@ public class BetDAOImpl implements BetDAO {
     private static final String DELETE =
             "SELECT delete_bet(?)";
 
-    public static final BetDAO BET_DAO = new BetDAOImpl();
+    public static BetDAO BET_DAO = new BetDAOImpl();
 
     private BetDAOImpl() {}
 

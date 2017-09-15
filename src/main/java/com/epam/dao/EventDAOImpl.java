@@ -28,7 +28,7 @@ public class EventDAOImpl implements EventDAO {
     private static final String DELETE =
             "SELECT delete_event(?)";
 
-    public static final EventDAO EVENT_DAO = new EventDAOImpl();
+    public static EventDAO EVENT_DAO = new EventDAOImpl();
 
     private EventDAOImpl() {}
 

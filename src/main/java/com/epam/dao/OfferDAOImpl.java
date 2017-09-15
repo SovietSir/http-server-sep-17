@@ -29,7 +29,7 @@ public class OfferDAOImpl implements OfferDAO {
     private static final String DELETE =
             "SELECT delete_offer(?)";
 
-    public static final OfferDAO OFFER_DAO = new OfferDAOImpl();
+    public static OfferDAO OFFER_DAO = new OfferDAOImpl();
 
     private OfferDAOImpl() {}
 

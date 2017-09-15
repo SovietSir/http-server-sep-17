@@ -26,7 +26,7 @@ public class LeagueDAOImpl implements LeagueDAO {
     private static final String DELETE =
             "SELECT delete_league(?)";
 
-    public static final LeagueDAO LEAGUE_DAO = new LeagueDAOImpl();
+    public static LeagueDAO LEAGUE_DAO = new LeagueDAOImpl();
 
     private LeagueDAOImpl() {}
 
