@@ -125,8 +125,8 @@ public class BetDAOImplTest {
     }
 
     @Test (expectedExceptions = { NoSuchElementException.class})
-    public void testDeleteByIdWithNoSuchElementException() throws Exception {
-        betDAO.deleteById(4L);
+    public void testdeleteWithNoSuchElementException() throws Exception {
+        betDAO.delete(4L);
         betList.remove(3);
         assertNull(betDAO.read(4L));
     }

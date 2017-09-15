@@ -1,12 +1,20 @@
 package com.epam.net;
 
 import com.epam.dao.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import io.vavr.Tuple2;
 import lombok.Setter;
 
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.concurrent.Callable;
 
 @SuppressWarnings("ConstantConditions")
 @Setter
@@ -17,6 +25,13 @@ class Respondent {
     static {
         Arrays.sort(PATHS);
     }
+
+    private Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, type, jsonDeserializationContext) -> {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+                return LocalDateTime.parse(json.getAsString(), formatter);
+            })
+            .create();
 
     HttpResponse getResponse(String request) {
         String[] contentAndTail = request.split("\r\n", 2);
@@ -39,7 +54,7 @@ class Respondent {
             return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
 
-        AbstractDAO dao;
+        DAOCrud dao;
         switch (tuples.get(0)._1) {
             case "leagues":
                 dao = LeagueDAOImpl.LEAGUE_DAO;
@@ -65,26 +80,55 @@ class Respondent {
 
         switch (method) {
             case GET:
-                return dao.respondOnGET(tuples);
+                return getResponse(tuples.size() > 0,
+                        () -> {
+                            Tuple2<String, Long> tuple = tuples.get(0);
+                            if (tuples.size() == 1) {
+                                if (tuple._2 == null) {
+                                    return new HttpResponse(gson.toJson(dao.readAll()));
+                                } else {
+                                    return new HttpResponse(gson.toJson(dao.read(tuple._2)));
+                                }
+                            } else {
+                                return new HttpResponse(gson.toJson(dao.readSubLevel(tuple._2)));
+                            }
+                        });
             case POST:
-                if (tuples.size() == 1 && tuples.get(0)._2 != null) {
-                    return dao.respondOnPOST(tuples.get(0)._2, body);
-                }
-                break;
+                return getResponse(
+                        tuples.size() == 1 && tuples.get(0)._2 != null,
+                        () -> new HttpResponse(gson.toJson(
+                                dao.update(tuples.get(0)._2, gson.fromJson(body, dao.getModelClass())))));
             case PUT:
-                if (tuples.size() == 1 && tuples.get(0)._2 == null) {
-                    return dao.respondOnPUT(body);
-                }
-                break;
+                return getResponse(
+                        tuples.size() == 1 && tuples.get(0)._2 == null,
+                        () -> new HttpResponse(gson.toJson(
+                                dao.create(gson.fromJson(body, dao.getModelClass())))));
             case DELETE:
-                if (tuples.size() == 1 && tuples.get(0)._2 != null) {
-                    return dao.respondOnDELETE(tuples.get(0)._2);
-                }
-                break;
+                return getResponse(
+                        tuples.size() == 1 && tuples.get(0)._2 != null,
+                        () -> {
+                            dao.delete(tuples.get(0)._2);
+                            return new HttpResponse(HttpCodes.OK);
+                        });
             default:
                 return new HttpResponse(HttpCodes.NOT_IMPLEMENTED);
         }
-        return new HttpResponse(HttpCodes.BAD_REQUEST);
+    }
+
+    //I could do it with Predicate<List<Tuple2...>>...
+    private HttpResponse getResponse(boolean predicate, Callable<HttpResponse> callable) {
+        if (!predicate) {
+            return new HttpResponse(HttpCodes.BAD_REQUEST);
+        }
+        try {
+            return callable.call();
+        } catch (SQLException e) {
+            return new HttpResponse(HttpCodes.INTERNAL_SERVER_ERROR);
+        } catch (NoSuchElementException e) {
+            return new HttpResponse(HttpCodes.NOT_FOUND);
+        } catch (Exception e) {
+            return new HttpResponse(HttpCodes.BAD_REQUEST);
+        }
     }
 
     /**
@@ -97,7 +141,7 @@ class Respondent {
         String[] tokens = path.substring(1).split("/");
         if (tokens.length == 0) return null;
         int idx = 0;
-        ArrayList<Tuple2<String, Long>> list = new ArrayList<>(2);
+        List<Tuple2<String, Long>> list = new ArrayList<>(2);
         String nextDir = null;
         while (idx < tokens.length) {
             String entity = tokens[idx++];

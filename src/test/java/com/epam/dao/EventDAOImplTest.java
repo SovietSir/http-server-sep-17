@@ -91,8 +91,8 @@ public class EventDAOImplTest {
     }
 
     @Test
-    public void testDeleteById() throws Exception {
-        eventDAO.deleteById(4L);
+    public void testDelete() throws Exception {
+        eventDAO.delete(4L);
         eventList.remove(3);
         assertEquals(eventDAO.readAll(),eventList);
     }

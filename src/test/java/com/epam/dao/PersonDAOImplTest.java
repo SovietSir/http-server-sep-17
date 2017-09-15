@@ -68,8 +68,8 @@ public class PersonDAOImplTest {
     }
 
     @Test
-    public void testDeleteById() throws Exception {
-         personDAO.deleteById(4L);
+    public void testDelete() throws Exception {
+         personDAO.delete(4L);
          personList.remove(3);
          assertEquals(personDAO.readAll(),personList);
     }
