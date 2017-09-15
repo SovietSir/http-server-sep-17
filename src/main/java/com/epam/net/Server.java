@@ -3,7 +3,6 @@ package com.epam.net;
 import com.epam.store.ConnectionPool;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import lombok.val;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -87,8 +86,8 @@ public class Server implements Runnable {
 
     @SneakyThrows
     private void read(SelectionKey key) {
-        val socketChannel = (SocketChannel) key.channel();
-        val buffer = (ByteBuffer) key.attachment();
+        SocketChannel socketChannel = (SocketChannel) key.channel();
+        ByteBuffer buffer = (ByteBuffer) key.attachment();
         int sumBytesRead = 0;
         for (int bytesRead = 1; bytesRead > 0 && buffer.hasRemaining(); ) {
             bytesRead = socketChannel.read(buffer);
@@ -104,7 +103,7 @@ public class Server implements Runnable {
     }
 
     private void write(SelectionKey key) {
-        val buffer = (ByteBuffer) key.attachment();
+        ByteBuffer buffer = (ByteBuffer) key.attachment();
         String request = getRequest(buffer);
         log.debug(() -> String.format("Request:%n%s", request));
         String response = respondent.getResponse(request).toString();
@@ -113,14 +112,14 @@ public class Server implements Runnable {
     }
 
     private String getRequest(ByteBuffer buffer) {
-        val requestBytes = new byte[buffer.limit()];
+        byte[] requestBytes = new byte[buffer.limit()];
         buffer.get(requestBytes, 0, buffer.limit()).clear();
         return new String(requestBytes);
     }
 
     @SneakyThrows
     private void writeResponse(String response, ByteBuffer buffer, SelectionKey key) {
-        try (val socketChannel = (SocketChannel) key.channel()) {
+        try (SocketChannel socketChannel = (SocketChannel) key.channel()) {
             byte[] responseBytes = response.getBytes();
             for (int i = 0; i < responseBytes.length; i += bufferCapacity) {
                 int limit = Math.min(i + bufferCapacity, responseBytes.length);

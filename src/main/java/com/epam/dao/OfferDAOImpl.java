@@ -5,7 +5,6 @@ import com.epam.net.HttpCodes;
 import com.epam.net.HttpResponse;
 import com.epam.store.ConnectionPool;
 import io.vavr.Tuple2;
-import lombok.val;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,7 +39,7 @@ public class OfferDAOImpl implements OfferDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_EVENT_ID)) {
             preparedStatement.setLong(1, eventId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            val list = new ArrayList<Offer>();
+            ArrayList<Offer> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(Offer.getFromResultSet(resultSet));
             }

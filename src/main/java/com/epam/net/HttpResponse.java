@@ -3,7 +3,6 @@ package com.epam.net;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.val;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,7 @@ public class HttpResponse {
     }
 
     public HttpResponse(String JSON) {
-        val headers = new HashMap<String, String>();
+        HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         this.code = HttpCodes.OK;
         this.headers = headers;
@@ -29,7 +28,7 @@ public class HttpResponse {
 
     @Override
     public String toString() {
-        val sb = new StringBuilder("HTTP/1.1 ");
+        StringBuilder sb = new StringBuilder("HTTP/1.1 ");
         sb.append(code);
         if (headers != null) {
             headers.forEach((k, v) -> sb.append(String.format("%n%s: %s", k, v)));
