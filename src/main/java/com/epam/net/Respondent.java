@@ -46,9 +46,9 @@ class Respondent {
             .create();
 
     HttpResponse getResponse(String request) {
-        String[] contentAndTail = request.split("\r\n\r\n", 2);
+        String[] contentAndTail = request.split("\r\n\r\n");
         if (contentAndTail.length == 0) {
-            new HttpResponse(HttpCodes.BAD_REQUEST);
+            return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
         String body = contentAndTail.length == 1 ? null : contentAndTail[1];
         contentAndTail = contentAndTail[0].split("\r\n", 2);
@@ -76,9 +76,6 @@ class Respondent {
         }
 
         DAOCrud dao = mapWithDAO.get(tuples.get(0)._1);
-        if (dao == null) {
-            return new HttpResponse(HttpCodes.BAD_REQUEST);
-        }
 
         switch (method) {
             case GET:

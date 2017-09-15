@@ -3,25 +3,28 @@ package com.epam.net;
 import com.epam.dao.*;
 import com.epam.model.*;
 import com.google.gson.*;
-
 import io.vavr.Tuple2;
-import org.mockito.ArgumentMatcher;
-import org.mockito.internal.matchers.*;
-import org.testng.annotations.*;
+import org.mockito.internal.matchers.GreaterOrEqual;
+import org.mockito.internal.matchers.GreaterThan;
+import org.mockito.internal.matchers.LessThan;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.epam.dao.BetDAOImpl.*;
-import static com.epam.dao.EventDAOImpl.*;
-import static com.epam.dao.LeagueDAOImpl.*;
-import static com.epam.dao.OfferDAOImpl.*;
-import static com.epam.dao.PersonDAOImpl.*;
+import static com.epam.dao.BetDAOImpl.BET_DAO;
+import static com.epam.dao.EventDAOImpl.EVENT_DAO;
+import static com.epam.dao.LeagueDAOImpl.LEAGUE_DAO;
+import static com.epam.dao.OfferDAOImpl.OFFER_DAO;
+import static com.epam.dao.PersonDAOImpl.PERSON_DAO;
 import static java.time.LocalDateTime.parse;
 import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 public class RespondentTest {
     private Respondent respondent;
@@ -37,7 +40,6 @@ public class RespondentTest {
     private static final HttpResponse BAD_REQUEST = new HttpResponse(HttpCodes.BAD_REQUEST);
     private static final HttpResponse NOT_IMPLEMENTED = new HttpResponse(HttpCodes.NOT_IMPLEMENTED);
     private static final HttpResponse NOT_FOUND = new HttpResponse(HttpCodes.NOT_FOUND);
-    private static final HttpResponse INTERNAL_SERVER_ERROR = new HttpResponse(HttpCodes.INTERNAL_SERVER_ERROR);
     private static final HttpResponse OK = new HttpResponse(HttpCodes.OK);
     private HttpResponse defaultLeagueResponce;
     private HttpResponse defaultEventResponce;
@@ -47,7 +49,6 @@ public class RespondentTest {
 
     @BeforeClass
     void setup() throws SQLException {
-        respondent = new Respondent();
         gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, type, jsonDeserializationContext) -> {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -192,7 +193,7 @@ public class RespondentTest {
         when(PERSON_DAO.getModelClass()).thenReturn(Person.class);
         doNothing().when(PERSON_DAO).delete(anyLong());
 
-
+        respondent = new Respondent();
     }
 
     @Test()
@@ -281,19 +282,20 @@ public class RespondentTest {
     public Object[][] badGetRequests() {
         return new Object[][]{
                 // Bad request
-//                {"someRubbish", NOT_IMPLEMENTED},
+                {"someRubbish", NOT_IMPLEMENTED},
+                {"\r\n\r\n", BAD_REQUEST},
                 // Bad URL
-//                {"GET /// HTTP/1.1", BAD_REQUEST},
-//                {"GET * HTTP/1.1", BAD_REQUEST},
+                {"GET /// HTTP/1.1", BAD_REQUEST},
+                {"GET * HTTP/1.1", BAD_REQUEST},
                 {"GET /users HTTP/1.1", BAD_REQUEST},
                 // Non-implemented (or unknown) method
-//                {"HEAD / HTTP/1.1", NOT_IMPLEMENTED},
-//                // denied routes
-//                {"GET /offers HTTP/1.1", BAD_REQUEST},
-//                {"GET /bets HTTP/1.1", BAD_REQUEST},
-//                {"GET /bets/3/any HTTP/1.1", BAD_REQUEST},
-//                // non-existent instances
-//                {"GET /leagues/999 HTTP/1.1", NOT_FOUND},
+                {"HEAD /leagues HTTP/1.1", NOT_IMPLEMENTED},
+                // denied routes
+                {"GET /offers HTTP/1.1", BAD_REQUEST},
+                {"GET /bets HTTP/1.1", BAD_REQUEST},
+                {"GET /bets/3/any HTTP/1.1", BAD_REQUEST},
+                // non-existent instances
+                {"GET /leagues/999 HTTP/1.1", NOT_FOUND},
         };
 
     }
@@ -313,7 +315,7 @@ public class RespondentTest {
     public Object[][] badPutRequests() {
         return new Object[][]{
                 //non-existent routes
-                //{String.format("PUT / HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
+                {String.format("PUT / HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 {String.format("PUT /bad HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 {String.format("PUT /leagues/events HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 //existent, but denied routes
@@ -341,7 +343,7 @@ public class RespondentTest {
     public Object[][] badPostRequests() {
         return new Object[][]{
                 //non-existent routes
-                //{String.format("POST / HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), new HttpResponse(HttpCodes.BAD_REQUEST)},
+                {String.format("POST / HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), new HttpResponse(HttpCodes.BAD_REQUEST)},
                 {String.format("POST /bad HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 {String.format("POST /leagues/events HTTP/1.1\r\n\r\n%s", defaultBodies.get("League")), BAD_REQUEST},
                 //existent, but denied routes
@@ -371,7 +373,13 @@ public class RespondentTest {
     @DataProvider(name = "Bad Delete Requests")
     public Object[][] badDeleteRequests() {
         return new Object[][]{
-
+                //non-existent routes
+                {"DELETE / HTTP/1.1", BAD_REQUEST},
+                {"DELETE /bad HTTP/1.1", BAD_REQUEST},
+                {"DELETE /leagues/events HTTP/1.1", BAD_REQUEST},
+                //existent, but denied routes
+                {"DELETE /leagues HTTP/1.1", BAD_REQUEST},
+                {"DELETE /leagues/3/events HTTP/1.1", BAD_REQUEST},
         };
     }
 }
