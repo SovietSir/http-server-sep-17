@@ -33,7 +33,7 @@ public class PersonDAOImpl implements PersonDAO {
         try (Connection connection = ConnectionPool.pool.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
-            ArrayList<Person> list = new ArrayList<>();
+            List<Person> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(Person.getFromResultSet(resultSet));
             }

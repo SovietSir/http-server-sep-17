@@ -19,7 +19,7 @@ public class HttpResponse {
     }
 
     HttpResponse(String JSON) {
-        HashMap<String, String> headers = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         this.code = HttpCodes.OK;
         this.headers = headers;

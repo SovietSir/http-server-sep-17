@@ -38,7 +38,7 @@ public class BetDAOImpl implements BetDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_OFFER_ID)) {
             preparedStatement.setLong(1, offerId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            ArrayList<Bet> list = new ArrayList<>();
+            List<Bet> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(Bet.getFromResultSet(resultSet));
             }
@@ -52,7 +52,7 @@ public class BetDAOImpl implements BetDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_PERSON_ID)) {
             preparedStatement.setLong(1, personId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                ArrayList<Bet> list = new ArrayList<>();
+                List<Bet> list = new ArrayList<>();
                 while (resultSet.next()) {
                     list.add(Bet.getFromResultSet(resultSet));
                 }

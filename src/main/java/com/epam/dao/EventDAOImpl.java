@@ -35,7 +35,7 @@ public class EventDAOImpl implements EventDAO {
         try (Connection connection = ConnectionPool.pool.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
-            ArrayList<Event> list = new ArrayList<>();
+            List<Event> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(Event.getFromResultSet(resultSet));
             }
@@ -54,7 +54,7 @@ public class EventDAOImpl implements EventDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_LEAGUE_ID)) {
             preparedStatement.setLong(1, leagueId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            ArrayList<Event> list = new ArrayList<>();
+            List<Event> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(Event.getFromResultSet(resultSet));
             }

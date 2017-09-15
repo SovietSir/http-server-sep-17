@@ -33,7 +33,7 @@ public class LeagueDAOImpl implements LeagueDAO {
         try (Connection connection = ConnectionPool.pool.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
-            ArrayList<League> list = new ArrayList<>();
+            List<League> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(League.getFromResultSet(resultSet));
             }

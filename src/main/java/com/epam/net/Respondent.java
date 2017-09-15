@@ -141,7 +141,7 @@ class Respondent {
         String[] tokens = path.substring(1).split("/");
         if (tokens.length == 0) return null;
         int idx = 0;
-        ArrayList<Tuple2<String, Long>> list = new ArrayList<>(2);
+        List<Tuple2<String, Long>> list = new ArrayList<>(2);
         String nextDir = null;
         while (idx < tokens.length) {
             String entity = tokens[idx++];

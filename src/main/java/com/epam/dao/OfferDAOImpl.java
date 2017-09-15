@@ -37,7 +37,7 @@ public class OfferDAOImpl implements OfferDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_EVENT_ID)) {
             preparedStatement.setLong(1, eventId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            ArrayList<Offer> list = new ArrayList<>();
+            List<Offer> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(Offer.getFromResultSet(resultSet));
             }
