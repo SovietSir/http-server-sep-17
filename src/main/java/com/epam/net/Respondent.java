@@ -20,6 +20,8 @@ class Respondent {
 
     private static final Map<String, DAOCrud> mapWithDAO = new HashMap<>();
 
+    private static final Map<String, String> nextDirs = new HashMap<>();
+
     static {
         mapWithDAO.put("leagues", LeagueDAOImpl.LEAGUE_DAO);
         mapWithDAO.put("events", EventDAOImpl.EVENT_DAO);
@@ -28,6 +30,11 @@ class Respondent {
         mapWithDAO.put("bets", BetDAOImpl.BET_DAO);
 
         pathSet = mapWithDAO.keySet();
+
+        nextDirs.put("leagues", "events");
+        nextDirs.put("events", "offers");
+        nextDirs.put("offers", "bets");
+        nextDirs.put("persons", "bets");
     }
 
     private Gson gson = new GsonBuilder()
@@ -138,20 +145,7 @@ class Respondent {
             String entity = tokens[idx++];
             if (!pathSet.contains(entity)) return null;
             if (nextDir != null && !entity.equals(nextDir)) return null;
-            switch (entity) {
-                case "leagues":
-                    nextDir = "events";
-                    break;
-                case "events":
-                    nextDir = "offers";
-                    break;
-                case "offers":
-                case "persons":
-                    nextDir = "bets";
-                    break;
-                default:
-                    nextDir = null;
-            }
+            nextDir = nextDirs.get(entity);
             Long id = null;
             if (!(idx == tokens.length)) {
                 id = extractLong(tokens[idx++]);
