@@ -1,10 +1,8 @@
 package com.epam.dao;
 
 import com.epam.model.Event;
-import com.epam.net.HttpCodes;
-import com.epam.net.HttpResponse;
+import com.epam.model.Offer;
 import com.epam.store.ConnectionPool;
-import io.vavr.Tuple2;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -43,6 +41,11 @@ public class EventDAOImpl implements EventDAO {
             }
             return list;
         }
+    }
+
+    @Override
+    public List<Offer> readSubLevel(Long id) throws SQLException {
+        return OfferDAOImpl.OFFER_DAO.readOffersByEventId(id);
     }
 
     @Override
@@ -114,33 +117,11 @@ public class EventDAOImpl implements EventDAO {
     }
 
     @Override
-    public void deleteById(Long id) throws SQLException {
+    public void delete(Long id) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE)) {
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
         }
-    }
-
-    @Override
-    public HttpResponse respondOnGET(List<Tuple2<String, Long>> tuples) {
-        String json;
-        try {
-            Tuple2<String, Long> tuple = tuples.get(0);
-            if (tuples.size() == 1) {
-                if (tuple._2 == null) {
-                    json = gson.toJson(readAll());
-                } else {
-                    json = gson.toJson(read(tuple._2));
-                }
-            } else {
-                json = gson.toJson(OfferDAOImpl.OFFER_DAO.readOffersByEventId(tuple._2));
-            }
-        } catch (SQLException e) {
-            return new HttpResponse(HttpCodes.INTERNAL_SERVER_ERROR);
-        } catch (NoSuchElementException e) {
-            return new HttpResponse(HttpCodes.NOT_FOUND);
-        }
-        return new HttpResponse(json);
     }
 }

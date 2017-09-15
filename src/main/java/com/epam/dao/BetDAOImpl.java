@@ -1,10 +1,7 @@
 package com.epam.dao;
 
 import com.epam.model.Bet;
-import com.epam.net.HttpCodes;
-import com.epam.net.HttpResponse;
 import com.epam.store.ConnectionPool;
-import io.vavr.Tuple2;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -98,6 +95,16 @@ public class BetDAOImpl implements BetDAO {
     }
 
     @Override
+    public List<Bet> readAll() throws SQLException {
+        throw new BadRequestException();
+    }
+
+    @Override
+    public List<Void> readSubLevel(Long aLong) throws SQLException {
+        throw new BadRequestException();
+    }
+
+    @Override
     public Bet update(Long id, Bet bet) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE)) {
@@ -117,26 +124,11 @@ public class BetDAOImpl implements BetDAO {
     }
 
     @Override
-    public void deleteById(Long id) throws SQLException {
+    public void delete(Long id) throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE)) {
             preparedStatement.setLong(1, id);
             preparedStatement.execute();
-        }
-    }
-
-    @Override
-    public HttpResponse respondOnGET(List<Tuple2<String, Long>> tuples) {
-        if (tuples.size() == 1 && tuples.get(0)._2 != null) {
-            try {
-                return new HttpResponse(gson.toJson(read(tuples.get(0)._2)));
-            } catch (SQLException e) {
-                return new HttpResponse(HttpCodes.INTERNAL_SERVER_ERROR);
-            } catch (NoSuchElementException e) {
-                return new HttpResponse(HttpCodes.NOT_FOUND);
-            }
-        } else {
-            return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
     }
 }

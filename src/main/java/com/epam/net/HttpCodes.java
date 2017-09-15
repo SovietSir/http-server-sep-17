@@ -15,7 +15,6 @@ public enum HttpCodes {
         this.code = code;
     }
 
-
     @Override
     public String toString() {
         return code + " " + super.toString();

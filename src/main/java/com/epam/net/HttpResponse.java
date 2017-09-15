@@ -14,11 +14,11 @@ public class HttpResponse {
     private Map<String, String> headers;
     private String body;
 
-    public HttpResponse(HttpCodes code) {
+    HttpResponse(HttpCodes code) {
         this(code, null, null);
     }
 
-    public HttpResponse(String JSON) {
+    HttpResponse(String JSON) {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         this.code = HttpCodes.OK;
