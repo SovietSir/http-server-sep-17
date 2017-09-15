@@ -1,4 +1,4 @@
 package com.epam.dao;
 
-class BadRequestException extends RuntimeException {
+public class BadRequestException extends RuntimeException {
 }
