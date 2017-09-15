@@ -116,12 +116,12 @@ class Respondent {
     }
 
     //I could do it with Predicate<List<Tuple2...>>...
-    private HttpResponse getResponse(boolean predicate, Callable<HttpResponse> supplier) {
+    private HttpResponse getResponse(boolean predicate, Callable<HttpResponse> callable) {
         if (!predicate) {
             return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
         try {
-            return supplier.call();
+            return callable.call();
         } catch (SQLException e) {
             return new HttpResponse(HttpCodes.INTERNAL_SERVER_ERROR);
         } catch (NoSuchElementException e) {
