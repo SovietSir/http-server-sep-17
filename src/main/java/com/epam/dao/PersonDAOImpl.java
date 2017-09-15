@@ -5,9 +5,7 @@ import com.epam.model.Person;
 import com.epam.store.ConnectionPool;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class PersonDAOImpl implements PersonDAO {
     /**
@@ -26,18 +24,15 @@ public class PersonDAOImpl implements PersonDAO {
 
     public static PersonDAO PERSON_DAO = new PersonDAOImpl();
 
-    private PersonDAOImpl() {}
+    private PersonDAOImpl() {
+    }
 
     @Override
     public List<Person> readAll() throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
-            List<Person> list = new ArrayList<>();
-            while (resultSet.next()) {
-                list.add(Person.getFromResultSet(resultSet));
-            }
-            return list;
+            return Person.getAllFromResultSet(resultSet);
         }
     }
 
@@ -54,11 +49,7 @@ public class PersonDAOImpl implements PersonDAO {
             preparedStatement.setInt(2, person.getPasswordHash());
             preparedStatement.setLong(3, person.getBalance());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Person.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Person.getFromResultSet(resultSet);
             }
         }
     }
@@ -69,11 +60,7 @@ public class PersonDAOImpl implements PersonDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Person.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Person.getFromResultSet(resultSet);
             }
         }
     }
@@ -87,11 +74,7 @@ public class PersonDAOImpl implements PersonDAO {
             preparedStatement.setInt(3, person.getPasswordHash());
             preparedStatement.setLong(4, person.getBalance());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Person.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Person.getFromResultSet(resultSet);
             }
         }
     }

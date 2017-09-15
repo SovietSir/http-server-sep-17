@@ -5,9 +5,7 @@ import com.epam.model.Offer;
 import com.epam.store.ConnectionPool;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class EventDAOImpl implements EventDAO {
     /**
@@ -28,18 +26,15 @@ public class EventDAOImpl implements EventDAO {
 
     public static EventDAO EVENT_DAO = new EventDAOImpl();
 
-    private EventDAOImpl() {}
+    private EventDAOImpl() {
+    }
 
     @Override
     public List<Event> readAll() throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
-            List<Event> list = new ArrayList<>();
-            while (resultSet.next()) {
-                list.add(Event.getFromResultSet(resultSet));
-            }
-            return list;
+            return Event.getAllFromResultSet(resultSet);
         }
     }
 
@@ -54,11 +49,7 @@ public class EventDAOImpl implements EventDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_LEAGUE_ID)) {
             preparedStatement.setLong(1, leagueId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            List<Event> list = new ArrayList<>();
-            while (resultSet.next()) {
-                list.add(Event.getFromResultSet(resultSet));
-            }
-            return list;
+            return Event.getAllFromResultSet(resultSet);
         }
     }
 
@@ -72,11 +63,7 @@ public class EventDAOImpl implements EventDAO {
             preparedStatement.setString(4, event.getGuestTeam());
             preparedStatement.setString(5, event.getScore());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Event.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Event.getFromResultSet(resultSet);
             }
         }
     }
@@ -87,11 +74,7 @@ public class EventDAOImpl implements EventDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Event.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Event.getFromResultSet(resultSet);
             }
         }
     }
@@ -107,11 +90,7 @@ public class EventDAOImpl implements EventDAO {
             preparedStatement.setString(5, event.getGuestTeam());
             preparedStatement.setString(6, event.getScore());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Event.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Event.getFromResultSet(resultSet);
             }
         }
     }
