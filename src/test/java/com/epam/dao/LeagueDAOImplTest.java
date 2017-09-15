@@ -71,7 +71,7 @@ public class LeagueDAOImplTest {
 
     @Test
     public void testDeleteById() throws Exception {
-        leagueDAO.deleteById(5L);
+        leagueDAO.delete(5L);
         leaguesList.remove(4);
         assertEquals(leagueDAO.readAll(),leaguesList);
     }

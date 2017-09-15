@@ -106,7 +106,7 @@ public class RespondentTest {
         when(LEAGUE_DAO.read(3L)).thenReturn(leaguesList.get(3));
         doNothing().when(LEAGUE_DAO).create(any(League.class));
         doNothing().when(LEAGUE_DAO).update(anyLong(), any(League.class));
-        doNothing().when(LEAGUE_DAO).deleteById(anyLong());
+        doNothing().when(LEAGUE_DAO).delete(anyLong());
 
         //mock EventDAO
         when(EVENT_DAO.readAll()).thenReturn(eventsList);
@@ -117,7 +117,7 @@ public class RespondentTest {
         when(EVENT_DAO.read(3L)).thenReturn(eventsList.get(3));
         doNothing().when(EVENT_DAO).create(any(Event.class));
         doNothing().when(EVENT_DAO).update(anyLong(), any(Event.class));
-        doNothing().when(EVENT_DAO).deleteById(anyLong());
+        doNothing().when(EVENT_DAO).delete(anyLong());
 
         //mock OfferDAO
         when(OFFER_DAO.readOffersByEventId(anyLong())).thenReturn(offersList);
@@ -127,7 +127,7 @@ public class RespondentTest {
         when(OFFER_DAO.read(3L)).thenReturn(offersList.get(3));
         doNothing().when(OFFER_DAO).create(any(Offer.class));
         doNothing().when(OFFER_DAO).update(anyLong(), any(Offer.class));
-        doNothing().when(OFFER_DAO).deleteById(anyLong());
+        doNothing().when(OFFER_DAO).delete(anyLong());
 
         //mock BetDAO
         when(BET_DAO.readBetsByOfferId(anyLong())).thenReturn(betsList);
@@ -138,7 +138,7 @@ public class RespondentTest {
         when(BET_DAO.read(3L)).thenReturn(betsList.get(3));
         doNothing().when(BET_DAO).create(any(Bet.class));
         doNothing().when(BET_DAO).update(anyLong(), any(Bet.class));
-        doNothing().when(BET_DAO).deleteById(anyLong());
+        doNothing().when(BET_DAO).delete(anyLong());
 
         //mock PersonDAO
         when(PERSON_DAO.readAll()).thenReturn(personsList);
@@ -148,7 +148,7 @@ public class RespondentTest {
         when(PERSON_DAO.read(3L)).thenReturn(personsList.get(3));
         doNothing().when(PERSON_DAO).create(any(Person.class));
         doNothing().when(PERSON_DAO).update(anyLong(), any(Person.class));
-        doNothing().when(PERSON_DAO).deleteById(anyLong());
+        doNothing().when(PERSON_DAO).delete(anyLong());
 
     }
 

@@ -100,7 +100,7 @@ public class OfferDAOImplTest {
 
     @Test (expectedExceptions = { NoSuchElementException.class})
     public void testDeleteByIdWithNoSuchElementException() throws Exception {
-        offerDAO.deleteById(2L);
+        offerDAO.delete(2L);
         assertNull(offerDAO.read(2L));
     }
 }
