@@ -1,8 +1,7 @@
 package com.epam.dao;
 import com.epam.model.League;
 import com.epam.store.ConnectionPool;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

@@ -139,4 +139,17 @@ public class BetDAOImplTest {
     public void testReadSubLevel() throws SQLException {
         betDAO.readSubLevel(1L);
     }
+    @Test
+    public void testReadSubLevel2() throws SQLException {
+//        return OfferDAOImpl.OFFER_DAO.readOffersByEventId(id);
+//        System.out.println(eventDAO.readSubLevel(2L));
+//        assertEquals(eventDAO.readSubLevel(1L),);
+//        System.out.println(betDAO.readSubLevel(1L));
+//        System.out.println(eventDAO.readSubLevel(1L));
+
+
+//        System.out.println(personDAO.readSubLevel(1L));
+//        System.out.println(leagueDAO.readSubLevel(1L));
+//        System.out.println(offerDAO.readSubLevel(1L));
+    }
 }

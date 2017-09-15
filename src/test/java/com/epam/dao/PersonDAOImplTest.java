@@ -73,4 +73,10 @@ public class PersonDAOImplTest {
          personList.remove(3);
          assertEquals(personDAO.readAll(),personList);
     }
+//    @Test(expectedExceptions = {SQLException.class})
+//    public void testCreateWithException() throws Exception {
+////        personList.add(new Person(4,"user4",444,444));
+//        personDAO.create(new Person(-4,"user4",-444,-444));
+////        assertEquals(personDAO.read(4L),personList.get(3));
+//    }
 }
