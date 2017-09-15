@@ -14,7 +14,6 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 @SuppressWarnings("ConstantConditions")
-@Setter
 class Respondent {
     private static final Set<String> pathSet;
 
