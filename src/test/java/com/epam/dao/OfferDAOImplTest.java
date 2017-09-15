@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import static java.time.LocalDateTime.parse;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 public class OfferDAOImplTest {
 
@@ -42,14 +43,14 @@ public class OfferDAOImplTest {
         leaguesList.add(new League(3, "PDL"));
         leaguesList.add(new League(4, "USPL"));
 
-        eventList.add(new Event(1, 1,  parse("2007-12-03T15:15:30"), "Zenith", "Nadir", "0:2"));
-        eventList.add(new Event(2, 2,  parse("2007-12-03T15:15:30"), "Andji", "Tom", "1:3"));
-        eventList.add(new Event(3, 3,  parse("2007-12-03T15:15:30"), "Bavaria", "MU", "0:0"));
-        eventList.add(new Event(4, 4,  parse("2007-12-03T15:15:30"), "Dinamo", "Sokol", "3:2"));
+        eventList.add(new Event(1, 1, parse("2007-12-03T15:15:30"), "Zenith", "Nadir", "0:2"));
+        eventList.add(new Event(2, 2, parse("2007-12-03T15:15:30"), "Andji", "Tom", "1:3"));
+        eventList.add(new Event(3, 3, parse("2007-12-03T15:15:30"), "Bavaria", "MU", "0:0"));
+        eventList.add(new Event(4, 4, parse("2007-12-03T15:15:30"), "Dinamo", "Sokol", "3:2"));
 
-        offerList.add(new Offer(1,1,"111",111,true));
-        offerList.add(new Offer(2,2,"222",222,false));
-        offerList.add(new Offer(3,3,"333",333,true));
+        offerList.add(new Offer(1, 1, "111", 111, true));
+        offerList.add(new Offer(2, 2, "222", 222, false));
+        offerList.add(new Offer(3, 3, "333", 333, true));
 
         leagueDAO.create(leaguesList.get(0));
         leagueDAO.create(leaguesList.get(1));
@@ -67,44 +68,45 @@ public class OfferDAOImplTest {
 
     @Test
     public void testReadOffersByEventId() throws Exception {
-        assertEquals(offerDAO.readOffersByEventId(1L).get(0),offerList.get(0));
+        assertEquals(offerDAO.readOffersByEventId(1L).get(0), offerList.get(0));
     }
 
     @Test
     public void testCreate() throws Exception {
-        offerList.add(new Offer(4,3,"444",444,true));
+        offerList.add(new Offer(4, 3, "444", 444, true));
         offerDAO.create(offerList.get(3));
-        assertEquals(offerDAO.read(4L),offerList.get(3));
+        assertEquals(offerDAO.read(4L), offerList.get(3));
     }
 
     @Test
     public void testRead() throws Exception {
-        assertEquals(offerDAO.read(1L),offerList.get(0));
+        assertEquals(offerDAO.read(1L), offerList.get(0));
     }
-    @Test(expectedExceptions = { NoSuchElementException.class})
+
+    @Test(expectedExceptions = {NoSuchElementException.class})
     public void testReadWithNoSuchElementException() throws SQLException {
         offerDAO.read(-1L);
     }
 
     @Test
     public void testUpdate() throws Exception {
-        Offer newOffer = new Offer(1,3,"333",333,true);
-        offerDAO.update(1L,newOffer);
-        assertEquals(offerDAO.read(1L),newOffer);
+        Offer newOffer = new Offer(1, 3, "333", 333, true);
+        offerDAO.update(1L, newOffer);
+        assertEquals(offerDAO.read(1L), newOffer);
     }
 
-    @Test(expectedExceptions = { NoSuchElementException.class})
+    @Test(expectedExceptions = {NoSuchElementException.class})
     public void testUpdateByIdWithNoSuchElementException() throws SQLException {
-        offerDAO.update(-1L,offerList.get(0));
+        offerDAO.update(-1L, offerList.get(0));
     }
 
-    @Test (expectedExceptions = { NoSuchElementException.class})
+    @Test(expectedExceptions = {NoSuchElementException.class})
     public void testDeleteByIdWithNoSuchElementException() throws Exception {
         offerDAO.delete(2L);
         assertNull(offerDAO.read(2L));
     }
 
-    @Test (expectedExceptions = {BadRequestException.class})
+    @Test(expectedExceptions = {BadRequestException.class})
     public void testReadAll() throws SQLException {
         offerDAO.readAll();
     }
