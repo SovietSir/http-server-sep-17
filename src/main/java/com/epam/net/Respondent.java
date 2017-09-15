@@ -3,7 +3,6 @@ package com.epam.net;
 import com.epam.dao.*;
 import io.vavr.Tuple2;
 import lombok.Setter;
-import lombok.val;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,7 +97,7 @@ class Respondent {
         String[] tokens = path.substring(1).split("/");
         if (tokens.length == 0) return null;
         int idx = 0;
-        val list = new ArrayList<Tuple2<String, Long>>(2);
+        ArrayList<Tuple2<String, Long>> list = new ArrayList<>(2);
         String nextDir = null;
         while (idx < tokens.length) {
             String entity = tokens[idx++];
