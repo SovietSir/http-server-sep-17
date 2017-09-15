@@ -17,15 +17,15 @@ public class PersonDAOImplTest {
 
      @BeforeClass
      void setup() throws SQLException {
+         ConnectionPool.pool.dropDatabase();
+         ConnectionPool.pool.initDatabase();
+
          personDAO = PersonDAOImpl.PERSON_DAO;
          personList = new ArrayList<>();
 
          personList.add(new Person(1,"user1",111,111));
          personList.add(new Person(2,"user2",222,222));
          personList.add(new Person(3,"user3",333,333));
-
-         ConnectionPool.pool.dropDatabase();
-         ConnectionPool.pool.initDatabase();
 
          personDAO.create(personList.get(0));
          personDAO.create(personList.get(1));
