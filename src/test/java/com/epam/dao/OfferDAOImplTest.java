@@ -78,7 +78,7 @@ public class OfferDAOImplTest {
     }
 
     @Test
-    public void testReadById() throws Exception {
+    public void testRead() throws Exception {
         assertEquals(offerDAO.read(1L),offerList.get(0));
     }
     @Test(expectedExceptions = { NoSuchElementException.class})
@@ -102,5 +102,10 @@ public class OfferDAOImplTest {
     public void testDeleteByIdWithNoSuchElementException() throws Exception {
         offerDAO.delete(2L);
         assertNull(offerDAO.read(2L));
+    }
+
+    @Test (expectedExceptions = {BadRequestException.class})
+    public void testReadAll() throws SQLException {
+        offerDAO.readAll();
     }
 }

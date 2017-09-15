@@ -130,4 +130,13 @@ public class BetDAOImplTest {
         betList.remove(3);
         assertNull(betDAO.read(4L));
     }
+
+    @Test (expectedExceptions = {BadRequestException.class})
+    public void testReadAll() throws SQLException {
+        betDAO.readAll();
+    }
+    @Test (expectedExceptions = {BadRequestException.class})
+    public void testReadSubLevel() throws SQLException {
+        betDAO.readSubLevel(1L);
+    }
 }
