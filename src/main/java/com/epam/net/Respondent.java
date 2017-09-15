@@ -1,9 +1,7 @@
 package com.epam.net;
 
 import com.epam.dao.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
+import com.google.gson.*;
 import io.vavr.Tuple2;
 import lombok.Setter;
 
@@ -31,10 +29,19 @@ class Respondent {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
                 return LocalDateTime.parse(json.getAsString(), formatter);
             })
+            .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (date, type, jsonSerializationContext) -> {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+                return date == null ? null : new JsonPrimitive(date.format(formatter));
+            })
             .create();
 
     HttpResponse getResponse(String request) {
-        String[] contentAndTail = request.split("\r\n", 2);
+        String[] contentAndTail = request.split("\r\n\r\n", 2);
+        if (contentAndTail.length == 0) {
+            new HttpResponse(HttpCodes.BAD_REQUEST);
+        }
+        String body = contentAndTail.length == 1 ? null : contentAndTail[1];
+        contentAndTail = contentAndTail[0].split("\r\n", 2);
         String[] methodAndPath = contentAndTail[0].split(" ");
 
         HttpMethod method;
@@ -74,9 +81,6 @@ class Respondent {
             default:
                 return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
-
-        contentAndTail = contentAndTail[1].split("\r\n\r\n");
-        String body = contentAndTail.length == 1 ? null : contentAndTail[1];
 
         switch (method) {
             case GET:

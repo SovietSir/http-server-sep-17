@@ -3,6 +3,7 @@ package com.epam.dao;
 import com.epam.model.Event;
 import com.epam.model.League;
 import com.epam.store.ConnectionPool;
+import lombok.EqualsAndHashCode;
 
 import java.sql.*;
 import java.util.ArrayList;
