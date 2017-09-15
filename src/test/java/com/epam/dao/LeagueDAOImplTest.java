@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import static org.testng.AssertJUnit.assertEquals;
 
@@ -45,6 +46,10 @@ public class LeagueDAOImplTest {
         assertEquals(leagueDAO.read(3L),leaguesList.get(2));
         assertEquals(leagueDAO.read(4L),leaguesList.get(3));
     }
+    @Test(expectedExceptions = { NoSuchElementException.class})
+    public void testReadWithNoSuchElementException() throws SQLException {
+        leagueDAO.read(-1L);
+    }
 
     @Test
     public void testCreate() throws Exception {
@@ -58,6 +63,10 @@ public class LeagueDAOImplTest {
         leagueDAO.update((long)1,new League(1,"NEW TEST LEAGUE"));
         leaguesList.set(0,new League(1,"NEW TEST LEAGUE"));
         assertEquals(leagueDAO.read(1L),leaguesList.get(0));
+    }
+    @Test(expectedExceptions = { NoSuchElementException.class})
+    public void testUpdateByIdWithNoSuchElementException() throws SQLException {
+        leagueDAO.update(-1L,leaguesList.get(0));
     }
 
     @Test

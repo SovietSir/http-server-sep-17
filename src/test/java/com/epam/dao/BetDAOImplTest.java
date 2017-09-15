@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import static java.time.LocalDateTime.parse;
 import static org.testng.Assert.*;
@@ -117,8 +118,14 @@ public class BetDAOImplTest {
         assertEquals(betDAO.read(2L),betList.get(1));
     }
 
-    @Test
-    public void testDeleteById() throws Exception {
+    @Test (expectedExceptions = { NoSuchElementException.class})
+    public void testUpdateWithNoSuchElementException() throws Exception {
+        betList.set(1,new Bet(2,1,1,111,1));
+        betDAO.update(200L,betList.get(1));
+    }
+
+    @Test (expectedExceptions = { NoSuchElementException.class})
+    public void testDeleteByIdWithNoSuchElementException() throws Exception {
         betDAO.deleteById(4L);
         betList.remove(3);
         assertNull(betDAO.read(4L));

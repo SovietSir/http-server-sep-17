@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import static org.testng.Assert.assertEquals;
 
@@ -49,11 +50,21 @@ public class PersonDAOImplTest {
         assertEquals(personDAO.read(2L),personList.get(1));
     }
 
+    @Test(expectedExceptions = { NoSuchElementException.class})
+    public void testReadByIdWithNoSuchElementException() throws SQLException {
+        personDAO.read(-1L);
+    }
+
     @Test
     public void testUpdate() throws Exception {
          personList.set(1,new Person(2,"User2_1",2221,2221));
          personDAO.update(2L,personList.get(1));
          assertEquals(personDAO.read(2L),personList.get(1));
+    }
+
+    @Test(expectedExceptions = { NoSuchElementException.class})
+    public void testUpdateByIdWithNoSuchElementException() throws SQLException {
+        personDAO.update(-1L,personList.get(0));
     }
 
     @Test

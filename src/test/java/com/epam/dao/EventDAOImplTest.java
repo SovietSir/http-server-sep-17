@@ -3,11 +3,13 @@ package com.epam.dao;
 import com.epam.model.Event;
 import com.epam.model.League;
 import com.epam.store.ConnectionPool;
+import org.postgresql.util.PSQLException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import static java.time.LocalDateTime.parse;
 import static org.testng.Assert.assertEquals;
@@ -71,12 +73,21 @@ public class EventDAOImplTest {
         assertEquals(eventDAO.read(5L), eventList.get(4));
     }
 
+    @Test(expectedExceptions = { NoSuchElementException.class})
+    public void testReadWithNoSuchElementException() throws SQLException {
+        eventDAO.read(-1L);
+    }
 
     @Test
     public void testUpdate() throws Exception {
         eventList.set(0,new Event(1, 1, parse("2007-12-03T15:15:30"), "Dinamo111", "Sokol111", "3:2"));
         eventDAO.update(1L,eventList.get(0));
         assertEquals(eventDAO.read(1L),eventList.get(0));
+    }
+
+    @Test(expectedExceptions = { NoSuchElementException.class})
+    public void testUpdateWithNoSuchElementException() throws SQLException {
+        eventDAO.update(-1L,eventList.get(0));
     }
 
     @Test
