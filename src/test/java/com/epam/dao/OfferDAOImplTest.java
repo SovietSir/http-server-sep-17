@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import static java.time.LocalDateTime.parse;
 import static org.testng.Assert.*;
@@ -88,8 +89,8 @@ public class OfferDAOImplTest {
         assertEquals(offerDAO.read(1L),newOffer);
     }
 
-    @Test
-    public void testDeleteById() throws Exception {
+    @Test (expectedExceptions = { NoSuchElementException.class})
+    public void testDeleteByIdWithNoSuchElementException() throws Exception {
         offerDAO.deleteById(2L);
         assertNull(offerDAO.read(2L));
     }
