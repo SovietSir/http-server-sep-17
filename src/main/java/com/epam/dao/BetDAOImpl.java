@@ -7,9 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class BetDAOImpl implements BetDAO {
     /**
@@ -30,7 +28,8 @@ public class BetDAOImpl implements BetDAO {
 
     public static BetDAO BET_DAO = new BetDAOImpl();
 
-    private BetDAOImpl() {}
+    private BetDAOImpl() {
+    }
 
     @Override
     public List<Bet> readBetsByOfferId(long offerId) throws SQLException {
@@ -38,11 +37,7 @@ public class BetDAOImpl implements BetDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_OFFER_ID)) {
             preparedStatement.setLong(1, offerId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            List<Bet> list = new ArrayList<>();
-            while (resultSet.next()) {
-                list.add(Bet.getFromResultSet(resultSet));
-            }
-            return list;
+            return Bet.getAllFromResultSet(resultSet);
         }
     }
 
@@ -52,11 +47,7 @@ public class BetDAOImpl implements BetDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_PERSON_ID)) {
             preparedStatement.setLong(1, personId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                List<Bet> list = new ArrayList<>();
-                while (resultSet.next()) {
-                    list.add(Bet.getFromResultSet(resultSet));
-                }
-                return list;
+                return Bet.getAllFromResultSet(resultSet);
             }
         }
     }
@@ -70,11 +61,7 @@ public class BetDAOImpl implements BetDAO {
             preparedStatement.setLong(3, bet.getAmount());
             preparedStatement.setFloat(4, bet.getGain());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Bet.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Bet.getFromResultSet(resultSet);
             }
         }
     }
@@ -85,11 +72,7 @@ public class BetDAOImpl implements BetDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Bet.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Bet.getFromResultSet(resultSet);
             }
         }
     }
@@ -114,11 +97,7 @@ public class BetDAOImpl implements BetDAO {
             preparedStatement.setLong(4, bet.getAmount());
             preparedStatement.setFloat(5, bet.getGain());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Bet.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Bet.getFromResultSet(resultSet);
             }
         }
     }

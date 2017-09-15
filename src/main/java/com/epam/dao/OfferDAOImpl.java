@@ -8,9 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class OfferDAOImpl implements OfferDAO {
     /**
@@ -29,7 +27,8 @@ public class OfferDAOImpl implements OfferDAO {
 
     public static OfferDAO OFFER_DAO = new OfferDAOImpl();
 
-    private OfferDAOImpl() {}
+    private OfferDAOImpl() {
+    }
 
     @Override
     public List<Offer> readOffersByEventId(long eventId) throws SQLException {
@@ -37,11 +36,7 @@ public class OfferDAOImpl implements OfferDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_EVENT_ID)) {
             preparedStatement.setLong(1, eventId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            List<Offer> list = new ArrayList<>();
-            while (resultSet.next()) {
-                list.add(Offer.getFromResultSet(resultSet));
-            }
-            return list;
+            return Offer.getAllFromResultSet(resultSet);
         }
     }
 
@@ -54,11 +49,7 @@ public class OfferDAOImpl implements OfferDAO {
             preparedStatement.setFloat(3, offer.getCoefficient());
             preparedStatement.setBoolean(4, offer.isResult());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Offer.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Offer.getFromResultSet(resultSet);
             }
         }
     }
@@ -69,11 +60,7 @@ public class OfferDAOImpl implements OfferDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Offer.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Offer.getFromResultSet(resultSet);
             }
         }
     }
@@ -98,11 +85,7 @@ public class OfferDAOImpl implements OfferDAO {
             preparedStatement.setFloat(4, offer.getCoefficient());
             preparedStatement.setBoolean(5, offer.isResult());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Offer.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return Offer.getFromResultSet(resultSet);
             }
         }
     }

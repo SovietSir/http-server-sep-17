@@ -10,7 +10,8 @@ import java.util.Map;
 @EqualsAndHashCode
 @AllArgsConstructor
 public class HttpResponse {
-    @NonNull private HttpCodes code;
+    @NonNull
+    private HttpCodes code;
     private Map<String, String> headers;
     private String body;
 

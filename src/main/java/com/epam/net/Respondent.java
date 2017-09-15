@@ -8,19 +8,30 @@ import lombok.Setter;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 @SuppressWarnings("ConstantConditions")
 class Respondent {
-    private static final String[] PATHS =
-            {"leagues", "events", "offers", "persons", "bets"};
+    private static final Set<String> pathSet;
+
+    private static final Map<String, DAOCrud> mapWithDAO = new HashMap<>();
+
+    private static final Map<String, String> nextDirs = new HashMap<>();
 
     static {
-        Arrays.sort(PATHS);
+        mapWithDAO.put("leagues", LeagueDAOImpl.LEAGUE_DAO);
+        mapWithDAO.put("events", EventDAOImpl.EVENT_DAO);
+        mapWithDAO.put("offers", OfferDAOImpl.OFFER_DAO);
+        mapWithDAO.put("persons", PersonDAOImpl.PERSON_DAO);
+        mapWithDAO.put("bets", BetDAOImpl.BET_DAO);
+
+        pathSet = mapWithDAO.keySet();
+
+        nextDirs.put("leagues", "events");
+        nextDirs.put("events", "offers");
+        nextDirs.put("offers", "bets");
+        nextDirs.put("persons", "bets");
     }
 
     private Gson gson = new GsonBuilder()
@@ -52,7 +63,11 @@ class Respondent {
 
         String path = methodAndPath[1];
         if (path.equals("/")) {
-            return new HttpResponse("{\"content\": \"start page\"}");
+            if (method == HttpMethod.GET) {
+                return new HttpResponse("{\"content\": \"start page\"}");
+            } else {
+                return new HttpResponse(HttpCodes.BAD_REQUEST);
+            }
         }
         List<Tuple2<String, Long>> tuples = parse(path);
         if (tuples == null) {
@@ -60,25 +75,9 @@ class Respondent {
             return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
 
-        DAOCrud dao;
-        switch (tuples.get(0)._1) {
-            case "leagues":
-                dao = LeagueDAOImpl.LEAGUE_DAO;
-                break;
-            case "events":
-                dao = EventDAOImpl.EVENT_DAO;
-                break;
-            case "offers":
-                dao = OfferDAOImpl.OFFER_DAO;
-                break;
-            case "persons":
-                dao = PersonDAOImpl.PERSON_DAO;
-                break;
-            case "bets":
-                dao = BetDAOImpl.BET_DAO;
-                break;
-            default:
-                return new HttpResponse(HttpCodes.BAD_REQUEST);
+        DAOCrud dao = mapWithDAO.get(tuples.get(0)._1);
+        if (dao == null) {
+            return new HttpResponse(HttpCodes.BAD_REQUEST);
         }
 
         switch (method) {
@@ -118,7 +117,6 @@ class Respondent {
         }
     }
 
-    //I could do it with Predicate<List<Tuple2...>>...
     private HttpResponse getResponse(boolean predicate, Callable<HttpResponse> callable) {
         if (!predicate) {
             return new HttpResponse(HttpCodes.BAD_REQUEST);
@@ -148,22 +146,9 @@ class Respondent {
         String nextDir = null;
         while (idx < tokens.length) {
             String entity = tokens[idx++];
-            if (Arrays.binarySearch(PATHS, entity) < 0) return null;
+            if (!pathSet.contains(entity)) return null;
             if (nextDir != null && !entity.equals(nextDir)) return null;
-            switch (entity) {
-                case "leagues":
-                    nextDir = "events";
-                    break;
-                case "events":
-                    nextDir = "offers";
-                    break;
-                case "offers":
-                case "persons":
-                    nextDir = "bets";
-                    break;
-                default:
-                    nextDir = null;
-            }
+            nextDir = nextDirs.get(entity);
             Long id = null;
             if (!(idx == tokens.length)) {
                 id = extractLong(tokens[idx++]);

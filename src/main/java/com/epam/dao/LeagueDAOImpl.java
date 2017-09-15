@@ -6,9 +6,7 @@ import com.epam.store.ConnectionPool;
 import lombok.EqualsAndHashCode;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class LeagueDAOImpl implements LeagueDAO {
     /**
@@ -27,18 +25,15 @@ public class LeagueDAOImpl implements LeagueDAO {
 
     public static LeagueDAO LEAGUE_DAO = new LeagueDAOImpl();
 
-    private LeagueDAOImpl() {}
+    private LeagueDAOImpl() {
+    }
 
     @Override
     public List<League> readAll() throws SQLException {
         try (Connection connection = ConnectionPool.pool.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
-            List<League> list = new ArrayList<>();
-            while (resultSet.next()) {
-                list.add(League.getFromResultSet(resultSet));
-            }
-            return list;
+            return League.getAllFromResultSet(resultSet);
         }
     }
 
@@ -53,11 +48,7 @@ public class LeagueDAOImpl implements LeagueDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT)) {
             preparedStatement.setString(1, league.getName());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return League.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return League.getFromResultSet(resultSet);
             }
         }
     }
@@ -68,11 +59,7 @@ public class LeagueDAOImpl implements LeagueDAO {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return League.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return League.getFromResultSet(resultSet);
             }
         }
     }
@@ -84,11 +71,7 @@ public class LeagueDAOImpl implements LeagueDAO {
             preparedStatement.setLong(1, id);
             preparedStatement.setString(2, league.getName());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return League.getFromResultSet(resultSet);
-                } else {
-                    throw new NoSuchElementException();
-                }
+                return League.getFromResultSet(resultSet);
             }
         }
     }
