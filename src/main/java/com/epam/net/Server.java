@@ -37,7 +37,7 @@ public class Server implements Runnable {
                 serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
                 log.info(() -> String.format("Server started, please visit: http://localhost:%s%n", port));
                 while (!Thread.currentThread().isInterrupted()) {
-                    selector.selectNow();
+                    selector.select(100);
                     Set<SelectionKey> keys = selector.selectedKeys();
                     keys.stream()
                             .filter(SelectionKey::isValid)
@@ -83,7 +83,7 @@ public class Server implements Runnable {
             if (socketChannel == null)
                 return;
             socketChannel.configureBlocking(false);
-            SelectionKey newKey = socketChannel.register(key.selector(), SelectionKey.OP_READ);
+            SelectionKey newKey = socketChannel.register(key.selector().wakeup(), SelectionKey.OP_READ);
             newKey.attach(ByteBuffer.allocateDirect(bufferCapacity));
             log.info(() -> String.format("Accepted {%s}", socketChannel));
         } catch (IOException e) {
