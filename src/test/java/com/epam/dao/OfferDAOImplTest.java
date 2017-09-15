@@ -81,12 +81,21 @@ public class OfferDAOImplTest {
     public void testReadById() throws Exception {
         assertEquals(offerDAO.read(1L),offerList.get(0));
     }
+    @Test(expectedExceptions = { NoSuchElementException.class})
+    public void testReadWithNoSuchElementException() throws SQLException {
+        offerDAO.read(-1L);
+    }
 
     @Test
     public void testUpdate() throws Exception {
         Offer newOffer = new Offer(1,3,"333",333,true);
         offerDAO.update(1L,newOffer);
         assertEquals(offerDAO.read(1L),newOffer);
+    }
+
+    @Test(expectedExceptions = { NoSuchElementException.class})
+    public void testUpdateByIdWithNoSuchElementException() throws SQLException {
+        offerDAO.update(-1L,offerList.get(0));
     }
 
     @Test (expectedExceptions = { NoSuchElementException.class})
