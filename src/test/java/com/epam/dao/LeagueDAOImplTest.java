@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import static org.testng.AssertJUnit.assertEquals;
 
-@Test(enabled = false)
+@Test
 public class LeagueDAOImplTest {
 
     private LeagueDAO leagueDAO;
